@@ -1,4 +1,4 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
     <!-- Base application theme. -->
     <style name="Base.Theme.ToDoBarzh" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
@@ -6,4 +6,29 @@
     </style>
 
     <style name="Theme.ToDoBarzh" parent="Base.Theme.ToDoBarzh" />
+
+    <style name="Widget.TextView" parent="Widget.AppCompat.TextView">
+        <item name="fontFamily">@font/roboto</item>
+    </style>
+
+    <style name="Widget.TextView.32" parent="Widget.AppCompat.TextView">
+        <item name="android:textSize">32sp</item>
+        <item name="lineHeight">38sp</item>
+    </style>
+
+    <style name="Widget.TextView.20" parent="Widget.AppCompat.TextView">
+        <item name="android:textSize">20sp</item>
+        <item name="lineHeight">32sp</item>
+    </style>
+
+    <style name="Widget.TextView.16" parent="Widget.AppCompat.TextView">
+        <item name="android:textSize">16sp</item>
+        <item name="lineHeight">20sp</item>
+    </style>
+
+    <style name="Widget.TextView.14" parent="Widget.AppCompat.TextView">
+        <item name="android:textSize">14sp</item>
+        <item name="lineHeight">20sp</item>
+    </style>
+
 </resources>

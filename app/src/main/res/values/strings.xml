@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">ToDoBarzh</string>
+    <string name="my_todo">Мои дела</string>
+    <string name="complete_todo_title">Выполнено - %1$d</string>
+    <string name="save">СОХРАНИТЬ</string>
+    <string name="delete">Удалить</string>
+    <string name="what_needs_be_done">Что надо сделать...</string>
+    <string name="hacer_antes">Сделать до</string>
+    <string name="importancia">Важность</string>
 </resources>
