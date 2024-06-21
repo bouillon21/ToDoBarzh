@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">ToDoBarzh</string>
+    <string name="main_screen_title">Мои\u00A0дела</string>
+    <string name="add_new_todo_button">Новое</string>
 </resources>
