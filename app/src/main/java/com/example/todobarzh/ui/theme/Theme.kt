@@ -3,7 +3,6 @@ package com.example.todobarzh.ui.theme
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import com.example.todobarzh.ui.theme.ToDoBarzhTheme.typography
 import com.example.todobarzh.ui.theme.local.AppColorScheme
 import com.example.todobarzh.ui.theme.local.AppTypography
 import com.example.todobarzh.ui.theme.local.LocalAppColorScheme

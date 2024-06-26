@@ -1,6 +1,9 @@
 package com.example.todobarzh.data.model
 
-enum class TodoPriorityEnum {
+enum class TodoPriorityEnum(val value: String) {
 
-    LOW, USUAL, URGENT
+    LOW("Низкая"),
+    USUAL("Средний"),
+    URGENT("Высокий")
+
 }

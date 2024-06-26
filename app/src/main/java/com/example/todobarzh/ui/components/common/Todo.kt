@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -89,12 +90,11 @@ fun Todo(
                     .weight(1f)
                     .align(Alignment.CenterVertically),
             )
-            Image(
+            Icon(
                 painter = painterResource(R.drawable.ic_info),
-                colorFilter = ColorFilter.tint(color = ToDoBarzhTheme.colorScheme.labelTertiary),
+                tint = ToDoBarzhTheme.colorScheme.labelTertiary,
                 contentDescription = null,
                 modifier = Modifier.size(24.dp),
-                alignment = Alignment.Center,
             )
             Spacer(Modifier.width(16.dp))
         }
