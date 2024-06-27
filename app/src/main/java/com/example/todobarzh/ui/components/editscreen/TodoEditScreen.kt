@@ -42,6 +42,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.example.todobarzh.R
 import com.example.todobarzh.data.model.TodoPriorityEnum
 import com.example.todobarzh.ui.components.common.TodoDatePicker
@@ -52,11 +53,15 @@ import com.example.todobarzh.ui.theme.ToDoBarzhTheme
 import com.example.todobarzh.ui.viewmodel.TodoEditViewModel
 import java.util.Date
 
-private fun onEvent(action: EditScreenEvent, viewModel: TodoEditViewModel) {
+private fun onEvent(
+    action: EditScreenEvent,
+    viewModel: TodoEditViewModel,
+    navController: NavController
+) {
     when (action) {
-        EditScreenEvent.Save -> TODO()
-        EditScreenEvent.Delete -> TODO()
-        EditScreenEvent.Exit -> TODO()
+        EditScreenEvent.Save -> navController.popBackStack()
+        EditScreenEvent.Delete -> navController.popBackStack()
+        EditScreenEvent.Exit -> navController.popBackStack()
     }
 }
 
@@ -69,10 +74,15 @@ sealed interface EditScreenEvent {
     data object Delete : EditScreenEvent
 }
 
-@Composable
-fun EditScreen(viewModel: TodoEditViewModel) {
+object EditScreenArg {
+    const val ID = "id"
+}
 
-    val onEvent = remember { { action: EditScreenEvent -> onEvent(action, viewModel) } }
+@Composable
+fun EditScreen(navController: NavController, viewModel: TodoEditViewModel) {
+
+    val onEvent =
+        remember { { action: EditScreenEvent -> onEvent(action, viewModel, navController) } }
 
     EditScreenContent(onEvent)
 }

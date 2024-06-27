@@ -35,10 +35,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.example.todobarzh.R
 import com.example.todobarzh.data.model.TodoItem
 import com.example.todobarzh.data.model.TodoPriorityEnum
 import com.example.todobarzh.ui.components.common.Todo
+import com.example.todobarzh.ui.navigation.TodoNavRoute
 import com.example.todobarzh.ui.theme.Blue
 import com.example.todobarzh.ui.theme.ToDoBarzhTheme
 import com.example.todobarzh.ui.theme.White
@@ -46,10 +48,14 @@ import com.example.todobarzh.ui.viewmodel.TodoViewModel
 import com.example.todobarzh.ui.viewstate.TodoViewState
 import java.util.Date
 
-private fun onEvent(action: MainScreenEvent, viewModel: TodoViewModel) {
+private fun onEvent(
+    action: MainScreenEvent,
+    viewModel: TodoViewModel,
+    navController: NavController
+) {
     when (action) {
         is MainScreenEvent.NewItemPressed -> {
-            viewModel.onAddTodoButtonPressed()
+            navController.navigate(TodoNavRoute.New.route)
         }
 
         is MainScreenEvent.TodoCheckChangePressed -> {
@@ -57,7 +63,7 @@ private fun onEvent(action: MainScreenEvent, viewModel: TodoViewModel) {
         }
 
         is MainScreenEvent.TodoEditPressed -> {
-            viewModel.onTodoEditPressed(action.todoId)
+            navController.navigate(TodoNavRoute.Edit.withArgs(action.todoId))
         }
     }
 }
@@ -72,9 +78,10 @@ sealed interface MainScreenEvent {
 }
 
 @Composable
-fun MainScreen(viewModel: TodoViewModel) {
+fun MainScreen(navController: NavController, viewModel: TodoViewModel) {
     val state by viewModel.todo.collectAsState(TodoViewState(listOf()))
-    val onEvent = remember { { action: MainScreenEvent -> onEvent(action, viewModel) } }
+    val onEvent =
+        remember { { action: MainScreenEvent -> onEvent(action, viewModel, navController) } }
 
     MainScreenContent(state, onEvent)
 }
