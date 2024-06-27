@@ -1,12 +1,27 @@
 package com.example.todobarzh.ui.components.common
 
-import android.annotation.SuppressLint
-import java.text.SimpleDateFormat
+import java.time.Instant
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 import java.util.Locale
 
-@SuppressLint("SimpleDateFormat")
-val formatter = SimpleDateFormat("dd MMM yyyy", Locale("ru"))
+fun Long.toDate(): LocalDate {
+    return LocalDateTime.ofInstant(
+        Instant.ofEpochMilli(this), ZoneId.systemDefault()
+    ).toLocalDate()
+}
 
-fun Long.toDateText(): String {
-    return formatter.format(this)
+fun LocalDate.toFormatString(): String {
+    return this.format(
+        DateTimeFormatter.ofPattern(
+            "dd MMM yyyy",
+            Locale("ru")
+        )
+    )
+}
+
+fun LocalDate.toLong(): Long {
+    return this.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
 }

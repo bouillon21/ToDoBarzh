@@ -29,8 +29,8 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -44,14 +44,18 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.todobarzh.R
-import com.example.todobarzh.data.model.TodoPriorityEnum
+import com.example.todobarzh.data.model.TodoPriority
+import com.example.todobarzh.data.model.emptyTodoItem
 import com.example.todobarzh.ui.components.common.TodoDatePicker
-import com.example.todobarzh.ui.components.common.toDateText
+import com.example.todobarzh.ui.components.common.toDate
+import com.example.todobarzh.ui.components.common.toFormatString
+import com.example.todobarzh.ui.components.common.toLong
 import com.example.todobarzh.ui.theme.Blue
 import com.example.todobarzh.ui.theme.Red
 import com.example.todobarzh.ui.theme.ToDoBarzhTheme
 import com.example.todobarzh.ui.viewmodel.TodoEditViewModel
-import java.util.Date
+import com.example.todobarzh.ui.viewstate.EditTodoViewState
+import java.time.LocalDate
 
 private fun onEvent(
     action: EditScreenEvent,
@@ -59,19 +63,27 @@ private fun onEvent(
     navController: NavController
 ) {
     when (action) {
-        EditScreenEvent.Save -> navController.popBackStack()
-        EditScreenEvent.Delete -> navController.popBackStack()
+        is EditScreenEvent.Save -> {
+            viewModel.saveTodo(action.todo.todoItem)
+            navController.popBackStack()
+        }
+
+        is EditScreenEvent.Delete -> {
+            viewModel.removeTodo(action.todoId)
+            navController.popBackStack()
+        }
+
         EditScreenEvent.Exit -> navController.popBackStack()
     }
 }
 
 sealed interface EditScreenEvent {
 
-    data object Save : EditScreenEvent
+    data class Save(val todo: EditTodoViewState) : EditScreenEvent
 
     data object Exit : EditScreenEvent
 
-    data object Delete : EditScreenEvent
+    data class Delete(val todoId: String) : EditScreenEvent
 }
 
 object EditScreenArg {
@@ -80,16 +92,16 @@ object EditScreenArg {
 
 @Composable
 fun EditScreen(navController: NavController, viewModel: TodoEditViewModel) {
-
+    val state by viewModel.todo.collectAsState()
     val onEvent =
         remember { { action: EditScreenEvent -> onEvent(action, viewModel, navController) } }
 
-    EditScreenContent(onEvent)
+    EditScreenContent(state, onEvent)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EditScreenContent(onEvent: (EditScreenEvent) -> Unit) {
+fun EditScreenContent(viewState: EditTodoViewState, onEvent: (EditScreenEvent) -> Unit) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
 
     Scaffold(
@@ -106,7 +118,7 @@ fun EditScreenContent(onEvent: (EditScreenEvent) -> Unit) {
                     }
                 },
                 actions = {
-                    TextButton(onClick = { onEvent.invoke(EditScreenEvent.Save) }) {
+                    TextButton(onClick = { onEvent.invoke(EditScreenEvent.Save(viewState)) }) {
                         Text(
                             text = stringResource(R.string.save_button_title),
                             style = ToDoBarzhTheme.typography.button,
@@ -132,29 +144,32 @@ fun EditScreenContent(onEvent: (EditScreenEvent) -> Unit) {
                 .fillMaxWidth()
                 .nestedScroll(scrollBehavior.nestedScrollConnection)
         ) {
-            EditTextTodo(Modifier.padding(16.dp))
-            PrioritySpinner(Modifier.padding(16.dp))
+            EditTextTodo(viewState, Modifier.padding(16.dp))
+            PrioritySpinner(viewState, Modifier.padding(16.dp))
             HorizontalDivider(
                 thickness = 1.dp,
                 color = ToDoBarzhTheme.colorScheme.supportSeparator,
                 modifier = Modifier.padding(horizontal = 16.dp)
             )
-            DeadlineTodoSwitcher(Modifier.padding(16.dp))
+            DeadlineTodoSwitcher(viewState, Modifier.padding(16.dp))
             HorizontalDivider(
                 thickness = 1.dp,
                 color = ToDoBarzhTheme.colorScheme.supportSeparator
             )
-            DeleteButton(Modifier.padding(16.dp), onEvent)
+            DeleteButton(viewState, Modifier.padding(16.dp), onEvent)
         }
     }
 }
 
 @Composable
-fun EditTextTodo(modifier: Modifier) {
-    var textInput by remember { mutableStateOf("") }
+fun EditTextTodo(viewState: EditTodoViewState, modifier: Modifier) {
+    var textInput by remember { mutableStateOf(viewState.todoItem.text) }
     TextField(
         value = textInput,
-        onValueChange = { textInput = it },
+        onValueChange = {
+            viewState.todoItem = viewState.todoItem.copy(text = it)
+            textInput = it
+        },
         placeholder = {
             Text(
                 text = stringResource(R.string.placeholder_edit_view),
@@ -166,6 +181,9 @@ fun EditTextTodo(modifier: Modifier) {
             focusedContainerColor = ToDoBarzhTheme.colorScheme.backSecondary,
             unfocusedIndicatorColor = Color.Transparent,
             focusedIndicatorColor = Color.Transparent,
+            cursorColor = ToDoBarzhTheme.colorScheme.labelTertiary,
+            focusedTextColor = ToDoBarzhTheme.colorScheme.labelPrimary,
+            unfocusedTextColor = ToDoBarzhTheme.colorScheme.labelPrimary
         ),
         shape = RoundedCornerShape(8.dp),
         textStyle = ToDoBarzhTheme.typography.body,
@@ -176,10 +194,9 @@ fun EditTextTodo(modifier: Modifier) {
 }
 
 @Composable
-fun PrioritySpinner(modifier: Modifier) {
-
+fun PrioritySpinner(viewState: EditTodoViewState, modifier: Modifier) {
     var expanded by remember { mutableStateOf(false) }
-    var important by remember { mutableStateOf(TodoPriorityEnum.LOW) }
+    var important by remember { mutableStateOf(viewState.todoItem.importance) }
 
     Column(
         modifier
@@ -203,9 +220,10 @@ fun PrioritySpinner(modifier: Modifier) {
             expanded = expanded,
             onDismissRequest = { expanded = false },
         ) {
-            TodoPriorityEnum.entries.forEach { entry ->
+            TodoPriority.entries.forEach { entry ->
                 DropdownMenuItem(
                     onClick = {
+                        viewState.todoItem = viewState.todoItem.copy(importance = entry)
                         important = entry
                         expanded = false
                     },
@@ -227,11 +245,17 @@ fun PrioritySpinner(modifier: Modifier) {
 
 
 @Composable
-fun DeadlineTodoSwitcher(modifier: Modifier) {
-    var checked: Boolean by remember { mutableStateOf(false) }
+fun DeadlineTodoSwitcher(viewState: EditTodoViewState, modifier: Modifier) {
+    var checked: Boolean by remember { mutableStateOf(viewState.todoItem.deadline != null) }
     var datePickerExpanded by remember { mutableStateOf(false) }
-    var deadlineDate by remember { mutableLongStateOf(Date().time) }
-    var deadlineDateText by remember { mutableStateOf(deadlineDate.toDateText()) }
+    var deadlineDate by remember {
+        mutableStateOf(
+            viewState.todoItem.deadline ?: LocalDate.now()
+        )
+    }
+    var deadlineDateText by remember {
+        mutableStateOf(deadlineDate.toFormatString())
+    }
 
     Row(modifier) {
         Column(
@@ -267,11 +291,12 @@ fun DeadlineTodoSwitcher(modifier: Modifier) {
     }
     if (datePickerExpanded) {
         TodoDatePicker(
-            date = deadlineDate,
+            date = deadlineDate.toLong(),
             onConfirm = {
                 datePickerExpanded = !datePickerExpanded
-                deadlineDate = it
-                deadlineDateText = it.toDateText()
+                deadlineDate = it.toDate()
+                viewState.todoItem = viewState.todoItem.copy(deadline = deadlineDate)
+                deadlineDateText = deadlineDate.toFormatString()
             },
             onDismiss = { datePickerExpanded = !datePickerExpanded }
         )
@@ -279,12 +304,12 @@ fun DeadlineTodoSwitcher(modifier: Modifier) {
 }
 
 @Composable
-fun DeleteButton(modifier: Modifier, onEvent: (EditScreenEvent) -> Unit) {
+fun DeleteButton(todo: EditTodoViewState, modifier: Modifier, onEvent: (EditScreenEvent) -> Unit) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
             .fillMaxWidth()
-            .clickable { onEvent.invoke(EditScreenEvent.Delete) }
+            .clickable { onEvent.invoke(EditScreenEvent.Delete(todo.todoItem.id)) }
     ) {
         Icon(
             painter = painterResource(id = R.drawable.ic_trash),
@@ -313,6 +338,6 @@ fun DeleteButton(modifier: Modifier, onEvent: (EditScreenEvent) -> Unit) {
 @Composable
 private fun EditScreenContentPreview() {
     ToDoBarzhTheme {
-        EditScreenContent({ _ -> })
+        EditScreenContent(EditTodoViewState(emptyTodoItem()), { _ -> })
     }
 }

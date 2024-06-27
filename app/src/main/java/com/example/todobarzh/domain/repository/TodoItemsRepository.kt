@@ -8,11 +8,15 @@ interface TodoItemsRepository {
 
     fun getTodoItems(): SharedFlow<List<TodoItem>>
 
+    fun findTodoItemById(id: String): TodoItem
+
     fun getCountCompleteTodo(): Int
+
+    fun updateTodo(item: TodoItem)
 
     fun addTodo(item: TodoItem)
 
     fun changeCheckTodo(todoId: String, checked: Boolean)
 
-    fun removeTodo(item: TodoItem)
+    fun removeTodo(todoId: String)
 }

@@ -1,13 +1,12 @@
 package com.example.todobarzh.data.repository
 
 import com.example.todobarzh.data.model.TodoItem
+import com.example.todobarzh.data.model.emptyTodoItem
 import com.example.todobarzh.domain.repository.TodoItemsRepository
-import dagger.Provides
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
-
 
 class TodoItemsRepositoryImpl @Inject constructor() : TodoItemsRepository {
 
@@ -15,7 +14,23 @@ class TodoItemsRepositoryImpl @Inject constructor() : TodoItemsRepository {
 
     override fun getTodoItems(): SharedFlow<List<TodoItem>> = todoItems.asSharedFlow()
 
-    override fun getCountCompleteTodo(): Int = todoItems.value.count { it.flagComplete }
+    override fun getCountCompleteTodo(): Int = todoItems.value.count { it.isComplete }
+
+    override fun updateTodo(item: TodoItem) {
+        todoItems.update { items ->
+            items.map { todo ->
+                if (todo.id == item.id) {
+                    item
+                } else {
+                    todo
+                }
+            }
+        }
+    }
+
+    override fun findTodoItemById(id: String): TodoItem {
+        return todoItems.value.find { it.id == id } ?: emptyTodoItem()
+    }
 
     override fun addTodo(item: TodoItem) {
         todoItems.update {
@@ -26,15 +41,21 @@ class TodoItemsRepositoryImpl @Inject constructor() : TodoItemsRepository {
     }
 
     override fun changeCheckTodo(todoId: String, checked: Boolean) {
-        todoItems.update {
-            val tet = todoItems.value.toMutableList()
-            tet.filter { it.id == todoId }.map { it.flagComplete = checked }
-            tet.toList()
+        todoItems.update { items ->
+            items.map {
+                if (it.id == todoId) {
+                    it.copy(isComplete = checked)
+                } else {
+                    it
+                }
+            }
         }
     }
 
-    override fun removeTodo(item: TodoItem) {
-
+    override fun removeTodo(todoId: String) {
+        todoItems.update { items ->
+            items.dropWhile { it.id == todoId }
+        }
     }
 
 }

@@ -38,7 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.todobarzh.R
 import com.example.todobarzh.data.model.TodoItem
-import com.example.todobarzh.data.model.TodoPriorityEnum
+import com.example.todobarzh.data.model.TodoPriority
 import com.example.todobarzh.ui.components.common.Todo
 import com.example.todobarzh.ui.navigation.TodoNavRoute
 import com.example.todobarzh.ui.theme.Blue
@@ -46,7 +46,7 @@ import com.example.todobarzh.ui.theme.ToDoBarzhTheme
 import com.example.todobarzh.ui.theme.White
 import com.example.todobarzh.ui.viewmodel.TodoViewModel
 import com.example.todobarzh.ui.viewstate.TodoViewState
-import java.util.Date
+import java.time.LocalDate
 
 private fun onEvent(
     action: MainScreenEvent,
@@ -227,10 +227,10 @@ private class TodoListProviders : PreviewParameterProvider<List<TodoItem>> {
                 TodoItem(
                     "1",
                     "text = 1",
-                    TodoPriorityEnum.USUAL,
+                    TodoPriority.USUAL,
                     null,
                     false,
-                    Date(),
+                    LocalDate.now(),
                     null
                 ),
                 TodoItem(
@@ -238,19 +238,19 @@ private class TodoListProviders : PreviewParameterProvider<List<TodoItem>> {
                     "But I must explain to you how all this mistaken idea of denouncing" +
                             " pleasure and praising pain was born and I will give you a" +
                             " complete account of the system",
-                    TodoPriorityEnum.USUAL,
+                    TodoPriority.USUAL,
                     null,
                     false,
-                    Date(),
+                    LocalDate.now(),
                     null
                 ),
                 TodoItem(
                     "3",
                     "text = 3",
-                    TodoPriorityEnum.USUAL,
+                    TodoPriority.USUAL,
                     null,
                     true,
-                    Date(),
+                    LocalDate.now(),
                     null
                 )
             )
