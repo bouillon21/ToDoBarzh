@@ -22,8 +22,8 @@ fun Navigation() {
             MainScreen(navController, hiltViewModel())
         }
         composable(
-            TodoNavRoute.Edit.route + "/{${EditScreenArg.ID}}",
-            arguments = listOf(navArgument(EditScreenArg.ID) {
+            TodoNavRoute.Edit.route + "/{${EditScreenArg.TODO_ID}}",
+            arguments = listOf(navArgument(EditScreenArg.TODO_ID) {
                 type = NavType.StringType
             })
         ) {

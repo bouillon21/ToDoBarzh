@@ -2,8 +2,14 @@ package com.example.todobarzh.ui.viewstate
 
 import com.example.todobarzh.domain.model.TodoItem
 
-data class TodoViewState(
-    val todoItems: List<TodoItem>,
+sealed class TodoViewState {
 
-    val isVisibleCompleteTodo: Boolean
-)
+    data object Loading : TodoViewState()
+
+    data class Loaded(
+        val todoItems: List<TodoItem>,
+        val isVisibleCompleteTodo: Boolean
+    ) : TodoViewState()
+
+    data object LoadingError : TodoViewState()
+}

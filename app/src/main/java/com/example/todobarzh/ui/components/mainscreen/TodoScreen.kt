@@ -88,7 +88,7 @@ sealed interface MainScreenEvent {
 
 @Composable
 fun MainScreen(navController: NavController, viewModel: TodoViewModel) {
-    val state by viewModel.todo.collectAsState(TodoViewState(listOf(), true))
+    val state by viewModel.viewState.collectAsState()
     val onEvent =
         remember { { action: MainScreenEvent -> onEvent(action, viewModel, navController) } }
 
@@ -101,88 +101,104 @@ fun MainScreenContent(viewState: TodoViewState, onEvent: (MainScreenEvent) -> Un
     val appBarState = rememberTopAppBarState()
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(appBarState)
 
-    val stateCounterComplete = "Выполнено — ${viewState.todoItems.count { it.isComplete }}"
-    val stateStyleTitle =
-        if (appBarState.collapsedFraction < 0.5f) {
-            ToDoBarzhTheme.typography.largeTitle
-        } else {
-            ToDoBarzhTheme.typography.title
-        }
-    val filteredVisibleItem =
-        viewState.todoItems.filter {
-            if (!viewState.isVisibleCompleteTodo) {
-                !it.isComplete
-            } else {
-                true
+    when (viewState) {
+        is TodoViewState.Loaded -> {
+            val stateCounterComplete = stringResource(
+                R.string.completeTodoTemplate,
+                viewState.todoItems.count { it.isComplete })
+            val stateStyleTitle =
+                if (appBarState.collapsedFraction < 0.5f) {
+                    ToDoBarzhTheme.typography.largeTitle
+                } else {
+                    ToDoBarzhTheme.typography.title
+                }
+            val filteredVisibleItem =
+                viewState.todoItems.filter {
+                    if (!viewState.isVisibleCompleteTodo) {
+                        !it.isComplete
+                    } else {
+                        true
+                    }
+                }
+            Scaffold(
+                topBar = {
+                    LargeTopAppBar(
+                        title = {
+                            Column {
+                                Text(
+                                    stringResource(R.string.main_screen_title),
+                                    style = stateStyleTitle,
+                                    color = ToDoBarzhTheme.colorScheme.labelPrimary
+                                )
+                                if (appBarState.collapsedFraction < 0.5f) {
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        modifier = Modifier.fillMaxWidth()
+                                    ) {
+                                        Text(
+                                            text = stateCounterComplete,
+                                            style = ToDoBarzhTheme.typography.body,
+                                            color = ToDoBarzhTheme.colorScheme.labelTertiary,
+                                        )
+                                        EyeButton(
+                                            viewState.isVisibleCompleteTodo,
+                                            onEvent,
+                                            Modifier.padding(end = 4.dp)
+                                        )
+                                    }
+                                }
+                            }
+                        },
+                        actions = {
+                            AnimatedVisibility(appBarState.collapsedFraction > 0.5f) {
+                                EyeButton(viewState.isVisibleCompleteTodo, onEvent, Modifier)
+                            }
+                        },
+                        scrollBehavior = scrollBehavior,
+                        colors = TopAppBarDefaults.topAppBarColors(
+                            containerColor = ToDoBarzhTheme.colorScheme.backPrimary,
+                            scrolledContainerColor = ToDoBarzhTheme.colorScheme.backSecondary,
+                        ), modifier = getShadowTopAppBarModifier(appBarState)
+                    )
+                },
+                floatingActionButton = {
+                    FloatingActionButton(
+                        onClick = {
+                            onEvent.invoke(MainScreenEvent.NewItemPressed)
+                        }, containerColor = Blue, contentColor = White
+                    ) {
+                        Icon(Icons.Default.Add, contentDescription = "Add")
+                    }
+                },
+                containerColor = ToDoBarzhTheme.colorScheme.backPrimary,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .nestedScroll(scrollBehavior.nestedScrollConnection)
+            ) { contentPadding ->
+                Column(
+                    Modifier
+                        .padding(contentPadding)
+                        .padding(horizontal = 8.dp)
+                ) {
+                    TodoList(filteredVisibleItem, onEvent)
+                }
             }
         }
 
-    Scaffold(
-        topBar = {
-            LargeTopAppBar(
-                title = {
-                    Column {
-                        Text(
-                            stringResource(R.string.main_screen_title),
-                            style = stateStyleTitle,
-                            color = ToDoBarzhTheme.colorScheme.labelPrimary
-                        )
-                        if (appBarState.collapsedFraction < 0.5f) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                Text(
-                                    text = stateCounterComplete,
-                                    style = ToDoBarzhTheme.typography.body,
-                                    color = ToDoBarzhTheme.colorScheme.labelTertiary,
-                                )
-                                EyeButton(viewState, onEvent, Modifier.padding(end = 4.dp))
-                            }
-                        }
-                    }
-                },
-                actions = {
-                    AnimatedVisibility(appBarState.collapsedFraction > 0.5f) {
-                        EyeButton(viewState, onEvent, Modifier)
-                    }
-                },
-                scrollBehavior = scrollBehavior,
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = ToDoBarzhTheme.colorScheme.backPrimary,
-                    scrolledContainerColor = ToDoBarzhTheme.colorScheme.backSecondary,
-                ), modifier = getShadowTopAppBarModifier(appBarState)
-            )
-        },
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = {
-                    onEvent.invoke(MainScreenEvent.NewItemPressed)
-                }, containerColor = Blue, contentColor = White
-            ) {
-                Icon(Icons.Default.Add, contentDescription = "Add")
-            }
-        },
-        containerColor = ToDoBarzhTheme.colorScheme.backPrimary,
-        modifier = Modifier
-            .fillMaxSize()
-            .nestedScroll(scrollBehavior.nestedScrollConnection)
-    ) { contentPadding ->
-        Column(
-            Modifier
-                .padding(contentPadding)
-                .padding(horizontal = 8.dp)
-        ) {
-            TodoList(filteredVisibleItem, onEvent)
-        }
+        TodoViewState.Loading -> TODO()
+        TodoViewState.LoadingError -> TODO()
     }
 }
 
 @Composable
-fun EyeButton(viewState: TodoViewState, onEvent: (MainScreenEvent) -> Unit, modifier: Modifier) {
+fun EyeButton(
+    isVisibleCompleteTodo: Boolean,
+    onEvent: (MainScreenEvent) -> Unit,
+    modifier: Modifier
+) {
     val painterEye =
-        if (viewState.isVisibleCompleteTodo) {
+        if (isVisibleCompleteTodo) {
             painterResource(id = R.drawable.ic_eye)
         } else {
             painterResource(id = R.drawable.ic_eye_off)
@@ -266,7 +282,7 @@ fun NewTodo(onEvent: (MainScreenEvent) -> Unit) {
 @Composable
 fun MainScreenContentPreview(@PreviewParameter(TodoListProviders::class) todoItems: List<TodoItem>) {
     ToDoBarzhTheme {
-        MainScreenContent(TodoViewState(todoItems, true), { _ -> })
+        MainScreenContent(TodoViewState.Loaded(todoItems, true), { _ -> })
     }
 }
 

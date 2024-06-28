@@ -2,7 +2,9 @@ package com.example.todobarzh.ui.viewmodel
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import com.example.todobarzh.domain.model.TodoItem
+import androidx.lifecycle.viewModelScope
+import com.example.todobarzh.domain.model.TodoPriority
+import com.example.todobarzh.domain.model.emptyTodoItem
 import com.example.todobarzh.domain.repository.TodoItemsRepository
 import com.example.todobarzh.ui.components.editscreen.EditScreenArg
 import com.example.todobarzh.ui.viewstate.EditTodoViewState
@@ -10,6 +12,9 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import java.time.LocalDate
 import javax.inject.Inject
 
 @HiltViewModel
@@ -18,21 +23,60 @@ class TodoEditViewModel @Inject constructor(
     private val repository: TodoItemsRepository,
 ) : ViewModel() {
 
-    private val id: String = savedStateHandle[EditScreenArg.ID] ?: EMPTY_ID
+    private val id: String = savedStateHandle[EditScreenArg.TODO_ID] ?: EMPTY_ID
 
-    private val mutableTodo = MutableStateFlow(EditTodoViewState(repository.findTodoItemById(id)))
-    val todo: StateFlow<EditTodoViewState> = mutableTodo.asStateFlow()
+    private val mutableViewState =
+        MutableStateFlow(EditTodoViewState.Loaded(emptyTodoItem()))
+    val viewState: StateFlow<EditTodoViewState> = mutableViewState.asStateFlow()
 
-    fun saveTodo(item: TodoItem) {
-        if (id == EMPTY_ID) {
-            repository.addTodo(item)
-        } else {
-            repository.updateTodo(item)
+    init {
+        viewModelScope.launch {
+            mutableViewState.update {
+                EditTodoViewState.Loaded(repository.findTodoItemById(id))
+            }
         }
     }
 
-    fun removeTodo(itemId: String) {
-        repository.removeTodo(itemId)
+    fun saveTodo() {
+        viewModelScope.launch {
+            val item = viewState.value as EditTodoViewState.Loaded
+            if (id == EMPTY_ID) {
+                repository.addTodo(item.todoItem)
+            } else {
+                repository.updateTodo(item.todoItem)
+            }
+        }
+    }
+
+    fun updateEditText(text: String) {
+        mutableViewState.update {
+            EditTodoViewState.Loaded(
+                mutableViewState.value.todoItem.copy(text = text)
+            )
+        }
+    }
+
+    fun updateImportance(important: TodoPriority) {
+        mutableViewState.update {
+            EditTodoViewState.Loaded(
+                mutableViewState.value.todoItem.copy(importance = important)
+            )
+        }
+    }
+
+    fun updateDate(date: LocalDate) {
+        mutableViewState.update {
+            EditTodoViewState.Loaded(
+                mutableViewState.value.todoItem.copy(deadline = date)
+            )
+        }
+    }
+
+    fun removeTodo() {
+        viewModelScope.launch {
+            val item = viewState.value as EditTodoViewState.Loaded
+            repository.removeTodo(item.todoItem.id)
+        }
     }
 
     companion object {

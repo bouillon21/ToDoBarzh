@@ -1,13 +1,14 @@
 package com.example.todobarzh.data.repository
 
+import com.example.todobarzh.data.source.MockDataSource
 import com.example.todobarzh.domain.model.TodoItem
 import com.example.todobarzh.domain.model.emptyTodoItem
 import com.example.todobarzh.domain.repository.TodoItemsRepository
-import com.example.todobarzh.data.source.MockDataSource
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class TodoItemsRepositoryImpl @Inject constructor(
@@ -20,11 +21,13 @@ class TodoItemsRepositoryImpl @Inject constructor(
         todoItems.value = dataSource.getTodoItems()
     }
 
-    override fun getTodoItems(): SharedFlow<List<TodoItem>> = todoItems.asSharedFlow()
+    override fun getTodoItems(): SharedFlow<List<TodoItem>> = todoItems
 
-    override fun getCountCompleteTodo(): Int = todoItems.value.count { it.isComplete }
+    override suspend fun getCountCompleteTodo(): Int = withContext(Dispatchers.IO) {
+        todoItems.value.count { it.isComplete }
+    }
 
-    override fun updateTodo(item: TodoItem) {
+    override suspend fun updateTodo(item: TodoItem) = withContext(Dispatchers.IO) {
         todoItems.update { items ->
             items.map { todo ->
                 if (todo.id == item.id) {
@@ -36,11 +39,11 @@ class TodoItemsRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun findTodoItemById(id: String): TodoItem {
-        return todoItems.value.find { it.id == id } ?: emptyTodoItem()
+    override suspend fun findTodoItemById(id: String): TodoItem = withContext(Dispatchers.IO) {
+        todoItems.value.find { it.id == id } ?: emptyTodoItem()
     }
 
-    override fun addTodo(item: TodoItem) {
+    override suspend fun addTodo(item: TodoItem) = withContext(Dispatchers.IO) {
         todoItems.update {
             val updatedList = todoItems.value.toMutableList()
             updatedList.add(0, item)
@@ -48,22 +51,22 @@ class TodoItemsRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun changeCheckTodo(todoId: String, checked: Boolean) {
-        todoItems.update { items ->
-            items.map {
-                if (it.id == todoId) {
-                    it.copy(isComplete = checked)
-                } else {
-                    it
+    override suspend fun changeCheckTodo(todoId: String, checked: Boolean) =
+        withContext(Dispatchers.IO) {
+            todoItems.update { items ->
+                items.map {
+                    if (it.id == todoId) {
+                        it.copy(isComplete = checked)
+                    } else {
+                        it
+                    }
                 }
             }
         }
-    }
 
-    override fun removeTodo(todoId: String) {
+    override suspend fun removeTodo(todoId: String) = withContext(Dispatchers.IO) {
         todoItems.update { items ->
             items.dropWhile { it.id == todoId }
         }
     }
-
 }
