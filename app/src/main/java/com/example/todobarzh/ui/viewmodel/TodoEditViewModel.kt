@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.todobarzh.domain.model.TodoPriority
 import com.example.todobarzh.domain.model.emptyTodoItem
 import com.example.todobarzh.domain.repository.TodoItemsRepository
-import com.example.todobarzh.ui.components.editscreen.EditScreenArg
+import com.example.todobarzh.ui.screens.editscreen.EditScreenArg
 import com.example.todobarzh.ui.viewstate.EditTodoViewState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow

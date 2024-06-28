@@ -1,4 +1,4 @@
-package com.example.todobarzh.ui.components.mainscreen
+package com.example.todobarzh.ui.screens.mainscreen
 
 import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
@@ -45,8 +45,9 @@ import androidx.navigation.NavController
 import com.example.todobarzh.R
 import com.example.todobarzh.domain.model.TodoItem
 import com.example.todobarzh.domain.model.TodoPriority
-import com.example.todobarzh.ui.components.common.getShadowTopAppBarModifier
+import com.example.todobarzh.ui.screens.common.getShadowTopAppBarModifier
 import com.example.todobarzh.ui.navigation.TodoNavRoute
+import com.example.todobarzh.ui.screens.mainscreen.components.Todo
 import com.example.todobarzh.ui.theme.Blue
 import com.example.todobarzh.ui.theme.ToDoBarzhTheme
 import com.example.todobarzh.ui.theme.White

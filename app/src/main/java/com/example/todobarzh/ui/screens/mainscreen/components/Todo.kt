@@ -1,4 +1,4 @@
-package com.example.todobarzh.ui.components.mainscreen
+package com.example.todobarzh.ui.screens.mainscreen.components
 
 import android.content.res.Configuration
 import androidx.compose.foundation.clickable
@@ -29,7 +29,7 @@ import androidx.compose.ui.unit.dp
 import com.example.todobarzh.R
 import com.example.todobarzh.domain.model.TodoItem
 import com.example.todobarzh.domain.model.TodoPriority
-import com.example.todobarzh.ui.components.common.toFormatString
+import com.example.todobarzh.ui.screens.common.toFormatString
 import com.example.todobarzh.ui.theme.Green
 import com.example.todobarzh.ui.theme.ToDoBarzhTheme
 import java.time.LocalDate

@@ -1,5 +1,6 @@
-package com.example.todobarzh.ui.components.common
+package com.example.todobarzh.ui.screens.editscreen.components
 
+import android.content.res.Configuration
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DatePickerDialog
@@ -11,7 +12,9 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import com.example.todobarzh.R
+import com.example.todobarzh.ui.screens.common.toLong
 import com.example.todobarzh.ui.theme.Blue
 import com.example.todobarzh.ui.theme.ToDoBarzhTheme
 import com.example.todobarzh.ui.theme.White
@@ -94,5 +97,22 @@ fun TodoDatePicker(
                 weekdayContentColor = ToDoBarzhTheme.colorScheme.labelPrimary
             )
         )
+    }
+}
+
+@Preview(
+    name = "light",
+    group = "datePicker",
+    uiMode = Configuration.UI_MODE_NIGHT_NO
+)
+@Preview(
+    name = "dark",
+    group = "datePicker",
+    uiMode = Configuration.UI_MODE_NIGHT_YES
+)
+@Composable
+fun TodoDatePickerPreview() {
+    ToDoBarzhTheme {
+        TodoDatePicker(LocalDate.now().toLong(), { }, {})
     }
 }

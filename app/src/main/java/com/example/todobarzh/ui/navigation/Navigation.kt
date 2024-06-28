@@ -7,9 +7,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.todobarzh.ui.components.editscreen.EditScreen
-import com.example.todobarzh.ui.components.editscreen.EditScreenArg
-import com.example.todobarzh.ui.components.mainscreen.MainScreen
+import com.example.todobarzh.ui.screens.editscreen.EditScreen
+import com.example.todobarzh.ui.screens.editscreen.EditScreenArg
+import com.example.todobarzh.ui.screens.mainscreen.MainScreen
 
 @Composable
 fun Navigation() {

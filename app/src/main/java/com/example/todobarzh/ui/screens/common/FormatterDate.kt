@@ -1,4 +1,4 @@
-package com.example.todobarzh.ui.components.common
+package com.example.todobarzh.ui.screens.common
 
 import java.time.Instant
 import java.time.LocalDate
