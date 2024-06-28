@@ -15,17 +15,22 @@ import javax.inject.Inject
 @HiltViewModel
 class TodoViewModel @Inject constructor(private val repository: TodoItemsRepository) : ViewModel() {
 
-    private val mutableTodo = MutableStateFlow(TodoViewState(listOf()))
+    private val mutableTodo = MutableStateFlow(TodoViewState(listOf(),true))
     val todo: SharedFlow<TodoViewState> = mutableTodo.asStateFlow()
 
     init {
         repository.getTodoItems().map {
-            mutableTodo.emit(TodoViewState(it))
+            mutableTodo.emit(TodoViewState(it,true))
         }.launchIn(viewModelScope)
     }
 
     fun onTodoCheckChangePressed(todoId: String, checked: Boolean) {
         repository.changeCheckTodo(todoId, checked)
+    }
+
+    fun onCompleteTodoVisibleChangePressed() {
+        mutableTodo.value =
+            mutableTodo.value.copy(isVisibleCompleteTodo = !mutableTodo.value.isVisibleCompleteTodo)
     }
 
 }

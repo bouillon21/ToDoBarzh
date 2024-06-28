@@ -44,8 +44,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.todobarzh.R
-import com.example.todobarzh.data.model.TodoPriority
-import com.example.todobarzh.data.model.emptyTodoItem
+import com.example.todobarzh.domain.model.TodoPriority
+import com.example.todobarzh.domain.model.emptyTodoItem
 import com.example.todobarzh.ui.components.common.TodoDatePicker
 import com.example.todobarzh.ui.components.common.toDate
 import com.example.todobarzh.ui.components.common.toFormatString

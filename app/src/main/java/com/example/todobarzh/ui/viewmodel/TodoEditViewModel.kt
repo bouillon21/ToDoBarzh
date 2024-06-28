@@ -2,7 +2,7 @@ package com.example.todobarzh.ui.viewmodel
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import com.example.todobarzh.data.model.TodoItem
+import com.example.todobarzh.domain.model.TodoItem
 import com.example.todobarzh.domain.repository.TodoItemsRepository
 import com.example.todobarzh.ui.components.editscreen.EditScreenArg
 import com.example.todobarzh.ui.viewstate.EditTodoViewState

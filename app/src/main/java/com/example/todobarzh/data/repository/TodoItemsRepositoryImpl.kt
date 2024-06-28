@@ -1,16 +1,24 @@
 package com.example.todobarzh.data.repository
 
-import com.example.todobarzh.data.model.TodoItem
-import com.example.todobarzh.data.model.emptyTodoItem
+import com.example.todobarzh.domain.model.TodoItem
+import com.example.todobarzh.domain.model.emptyTodoItem
 import com.example.todobarzh.domain.repository.TodoItemsRepository
+import com.example.todobarzh.data.source.MockDataSource
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
-class TodoItemsRepositoryImpl @Inject constructor() : TodoItemsRepository {
+class TodoItemsRepositoryImpl @Inject constructor(
+    dataSource: MockDataSource
+) : TodoItemsRepository {
 
-    private val todoItems = hardTodo.todoItems
+    private val todoItems = MutableStateFlow<List<TodoItem>>(emptyList())
+
+    init {
+        todoItems.value = dataSource.getTodoItems()
+    }
 
     override fun getTodoItems(): SharedFlow<List<TodoItem>> = todoItems.asSharedFlow()
 

@@ -1,6 +1,6 @@
 package com.example.todobarzh.domain.repository
 
-import com.example.todobarzh.data.model.TodoItem
+import com.example.todobarzh.domain.model.TodoItem
 import kotlinx.coroutines.flow.SharedFlow
 
 
