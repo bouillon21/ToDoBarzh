@@ -1,4 +1,4 @@
-package com.example.todobarzh.data.model
+package com.example.todobarzh.domain.model
 
 enum class TodoPriority(val value: String) {
 

@@ -1,4 +1,4 @@
-package com.example.todobarzh.data.model
+package com.example.todobarzh.domain.model
 
 import java.time.LocalDate
 import java.util.UUID

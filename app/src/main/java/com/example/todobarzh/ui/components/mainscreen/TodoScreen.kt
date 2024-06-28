@@ -1,12 +1,15 @@
 package com.example.todobarzh.ui.components.mainscreen
 
 import android.content.res.Configuration
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -18,10 +21,12 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -29,6 +34,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -37,9 +43,9 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.todobarzh.R
-import com.example.todobarzh.data.model.TodoItem
-import com.example.todobarzh.data.model.TodoPriority
-import com.example.todobarzh.ui.components.common.Todo
+import com.example.todobarzh.domain.model.TodoItem
+import com.example.todobarzh.domain.model.TodoPriority
+import com.example.todobarzh.ui.components.common.getShadowTopAppBarModifier
 import com.example.todobarzh.ui.navigation.TodoNavRoute
 import com.example.todobarzh.ui.theme.Blue
 import com.example.todobarzh.ui.theme.ToDoBarzhTheme
@@ -49,12 +55,10 @@ import com.example.todobarzh.ui.viewstate.TodoViewState
 import java.time.LocalDate
 
 private fun onEvent(
-    action: MainScreenEvent,
-    viewModel: TodoViewModel,
-    navController: NavController
+    action: MainScreenEvent, viewModel: TodoViewModel, navController: NavController
 ) {
     when (action) {
-        is MainScreenEvent.NewItemPressed -> {
+        MainScreenEvent.NewItemPressed -> {
             navController.navigate(TodoNavRoute.New.route)
         }
 
@@ -65,6 +69,9 @@ private fun onEvent(
         is MainScreenEvent.TodoEditPressed -> {
             navController.navigate(TodoNavRoute.Edit.withArgs(action.todoId))
         }
+
+        MainScreenEvent.CompleteTodoVisibleChangePressed ->
+            viewModel.onCompleteTodoVisibleChangePressed()
     }
 }
 
@@ -75,11 +82,13 @@ sealed interface MainScreenEvent {
     data class TodoCheckChangePressed(val todoId: String, val checked: Boolean) : MainScreenEvent
 
     data class TodoEditPressed(val todoId: String) : MainScreenEvent
+
+    data object CompleteTodoVisibleChangePressed : MainScreenEvent
 }
 
 @Composable
 fun MainScreen(navController: NavController, viewModel: TodoViewModel) {
-    val state by viewModel.todo.collectAsState(TodoViewState(listOf()))
+    val state by viewModel.todo.collectAsState(TodoViewState(listOf(), true))
     val onEvent =
         remember { { action: MainScreenEvent -> onEvent(action, viewModel, navController) } }
 
@@ -89,31 +98,68 @@ fun MainScreen(navController: NavController, viewModel: TodoViewModel) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreenContent(viewState: TodoViewState, onEvent: (MainScreenEvent) -> Unit) {
+    val appBarState = rememberTopAppBarState()
+    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(appBarState)
 
-    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+    val stateCounterComplete = "Выполнено — ${viewState.todoItems.count { it.isComplete }}"
+    val stateStyleTitle =
+        if (appBarState.collapsedFraction < 0.5f) {
+            ToDoBarzhTheme.typography.largeTitle
+        } else {
+            ToDoBarzhTheme.typography.title
+        }
+    val filteredVisibleItem =
+        viewState.todoItems.filter {
+            if (!viewState.isVisibleCompleteTodo) {
+                !it.isComplete
+            } else {
+                true
+            }
+        }
+
     Scaffold(
         topBar = {
-            TopAppBar(
+            LargeTopAppBar(
                 title = {
-                    Text(
-                        stringResource(R.string.main_screen_title),
-                        style = ToDoBarzhTheme.typography.largeTitle,
-                        color = ToDoBarzhTheme.colorScheme.labelPrimary
-                    )
+                    Column {
+                        Text(
+                            stringResource(R.string.main_screen_title),
+                            style = stateStyleTitle,
+                            color = ToDoBarzhTheme.colorScheme.labelPrimary
+                        )
+                        if (appBarState.collapsedFraction < 0.5f) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Text(
+                                    text = stateCounterComplete,
+                                    style = ToDoBarzhTheme.typography.body,
+                                    color = ToDoBarzhTheme.colorScheme.labelTertiary,
+                                )
+                                EyeButton(viewState, onEvent, Modifier.padding(end = 4.dp))
+                            }
+                        }
+                    }
+                },
+                actions = {
+                    AnimatedVisibility(appBarState.collapsedFraction > 0.5f) {
+                        EyeButton(viewState, onEvent, Modifier)
+                    }
                 },
                 scrollBehavior = scrollBehavior,
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = ToDoBarzhTheme.colorScheme.backPrimary
-                )
+                    containerColor = ToDoBarzhTheme.colorScheme.backPrimary,
+                    scrolledContainerColor = ToDoBarzhTheme.colorScheme.backSecondary,
+                ), modifier = getShadowTopAppBarModifier(appBarState)
             )
         },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
                     onEvent.invoke(MainScreenEvent.NewItemPressed)
-                },
-                containerColor = Blue,
-                contentColor = White
+                }, containerColor = Blue, contentColor = White
             ) {
                 Icon(Icons.Default.Add, contentDescription = "Add")
             }
@@ -128,9 +174,29 @@ fun MainScreenContent(viewState: TodoViewState, onEvent: (MainScreenEvent) -> Un
                 .padding(contentPadding)
                 .padding(horizontal = 8.dp)
         ) {
-            Spacer(Modifier.height(16.dp))
-            TodoList(viewState.todoItems, onEvent)
+            TodoList(filteredVisibleItem, onEvent)
         }
+    }
+}
+
+@Composable
+fun EyeButton(viewState: TodoViewState, onEvent: (MainScreenEvent) -> Unit, modifier: Modifier) {
+    val painterEye =
+        if (viewState.isVisibleCompleteTodo) {
+            painterResource(id = R.drawable.ic_eye)
+        } else {
+            painterResource(id = R.drawable.ic_eye_off)
+        }
+
+    IconButton(
+        onClick = { onEvent.invoke(MainScreenEvent.CompleteTodoVisibleChangePressed) },
+        modifier = modifier
+    ) {
+        Icon(
+            painter = painterEye,
+            tint = Blue,
+            contentDescription = null,
+        )
     }
 }
 
@@ -139,7 +205,9 @@ fun MainScreenContent(viewState: TodoViewState, onEvent: (MainScreenEvent) -> Un
 fun TodoList(todoItems: List<TodoItem>, onEvent: (MainScreenEvent) -> Unit) {
     Column(
         modifier = Modifier
-            .background(ToDoBarzhTheme.colorScheme.backSecondary, shape = RoundedCornerShape(8.dp))
+            .background(
+                ToDoBarzhTheme.colorScheme.backSecondary, shape = RoundedCornerShape(8.dp)
+            )
             .padding(vertical = 8.dp)
     ) {
         LazyColumn {
@@ -198,7 +266,7 @@ fun NewTodo(onEvent: (MainScreenEvent) -> Unit) {
 @Composable
 fun MainScreenContentPreview(@PreviewParameter(TodoListProviders::class) todoItems: List<TodoItem>) {
     ToDoBarzhTheme {
-        MainScreenContent(TodoViewState(todoItems), { _ -> })
+        MainScreenContent(TodoViewState(todoItems, true), { _ -> })
     }
 }
 
