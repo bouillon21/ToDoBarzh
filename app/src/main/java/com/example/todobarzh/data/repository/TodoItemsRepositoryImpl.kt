@@ -66,7 +66,7 @@ class TodoItemsRepositoryImpl @Inject constructor(
 
     override suspend fun removeTodo(todoId: String) = withContext(Dispatchers.IO) {
         todoItems.update { items ->
-            items.dropWhile { it.id == todoId }
+            items.filter { it.id != todoId }
         }
     }
 }
