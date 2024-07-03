@@ -8,8 +8,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -19,24 +18,45 @@ class TodoViewModel @Inject constructor(
     private val repository: TodoItemsRepository
 ) : ViewModel() {
 
-    private val mutableViewState = MutableStateFlow(TodoViewState.Loaded(listOf(), true))
+    private val mutableViewState = MutableStateFlow(TodoViewState.Loaded(listOf(), 0, true))
     val viewState: StateFlow<TodoViewState> = mutableViewState.asStateFlow()
 
+    private val isVisibleCompleteTodo = MutableStateFlow(true)
+
+    private val countCompleted = MutableStateFlow(0)
+
     init {
-        repository.getTodoItems().map {
-            mutableViewState.emit(TodoViewState.Loaded(it, true))
-        }.launchIn(viewModelScope)
+        viewModelScope.launch {
+            calculateCountComplete()
+            repository.getTodoItems()
+                .combine(isVisibleCompleteTodo) { todoItemList, doneTasksVisibility ->
+                    todoItemList.filter { !it.isComplete or doneTasksVisibility }
+                }.collect {
+                    mutableViewState.emit(
+                        TodoViewState.Loaded(
+                            it,
+                            countCompleted.value,
+                            isVisibleCompleteTodo.value
+                        )
+                    )
+                }
+        }
+    }
+
+    private fun calculateCountComplete() {
+        viewModelScope.launch {
+            countCompleted.value = mutableViewState.value.todoItems.count { it.isComplete }
+        }
     }
 
     fun onTodoCheckChangePressed(todoId: String, checked: Boolean) {
         viewModelScope.launch {
             repository.changeCheckTodo(todoId, checked)
+            calculateCountComplete()
         }
     }
 
     fun onCompleteTodoVisibleChangePressed() {
-        mutableViewState.update {
-            mutableViewState.value.copy(isVisibleCompleteTodo = !it.isVisibleCompleteTodo)
-        }
+        isVisibleCompleteTodo.update { !it }
     }
 }

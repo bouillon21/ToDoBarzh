@@ -8,6 +8,7 @@ sealed class TodoViewState {
 
     data class Loaded(
         val todoItems: List<TodoItem>,
+        val countCompleted: Int,
         val isVisibleCompleteTodo: Boolean
     ) : TodoViewState()
 

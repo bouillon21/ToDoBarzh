@@ -6,7 +6,8 @@ import com.example.todobarzh.domain.model.emptyTodoItem
 import com.example.todobarzh.domain.repository.TodoItemsRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -21,7 +22,7 @@ class TodoItemsRepositoryImpl @Inject constructor(
         todoItems.value = dataSource.getTodoItems()
     }
 
-    override fun getTodoItems(): SharedFlow<List<TodoItem>> = todoItems
+    override fun getTodoItems(): StateFlow<List<TodoItem>> = todoItems.asStateFlow()
 
     override suspend fun getCountCompleteTodo(): Int = withContext(Dispatchers.IO) {
         todoItems.value.count { it.isComplete }
