@@ -7,9 +7,9 @@ sealed class TodoViewState {
     data object Loading : TodoViewState()
 
     data class Loaded(
-        val todoItems: List<TodoItem>,
-        val countCompleted: Int,
-        val isVisibleCompleteTodo: Boolean
+        val todoItems: List<TodoItem> = listOf(),
+        val countCompleted: Int = 0,
+        val isVisibleCompleteTodo: Boolean = true
     ) : TodoViewState()
 
     data object LoadingError : TodoViewState()

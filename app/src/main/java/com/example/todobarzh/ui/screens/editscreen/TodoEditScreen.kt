@@ -37,7 +37,6 @@ import com.example.todobarzh.ui.theme.Blue
 import com.example.todobarzh.ui.theme.ToDoBarzhTheme
 import com.example.todobarzh.ui.viewmodel.TodoEditViewModel
 import com.example.todobarzh.ui.viewstate.EditTodoViewState
-import java.time.LocalDate
 
 private fun onEvent(
     action: EditScreenEvent,
@@ -77,7 +76,7 @@ sealed interface EditScreenEvent {
 
     data class UpdateImportance(val important: TodoPriority) : EditScreenEvent
 
-    data class UpdateDate(val date: LocalDate) : EditScreenEvent
+    data class UpdateDate(val date: Long?) : EditScreenEvent
 }
 
 object EditScreenArg {

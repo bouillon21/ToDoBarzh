@@ -14,7 +14,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.time.LocalDate
 import javax.inject.Inject
 
 @HiltViewModel
@@ -64,7 +63,7 @@ class TodoEditViewModel @Inject constructor(
         }
     }
 
-    fun updateDate(date: LocalDate) {
+    fun updateDate(date: Long?) {
         mutableViewState.update {
             EditTodoViewState.Loaded(
                 mutableViewState.value.todoItem.copy(deadline = date)

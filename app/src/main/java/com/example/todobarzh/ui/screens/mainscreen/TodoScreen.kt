@@ -53,7 +53,6 @@ import com.example.todobarzh.ui.theme.ToDoBarzhTheme
 import com.example.todobarzh.ui.theme.White
 import com.example.todobarzh.ui.viewmodel.TodoViewModel
 import com.example.todobarzh.ui.viewstate.TodoViewState
-import java.time.LocalDate
 
 private fun onEvent(
     action: MainScreenEvent, viewModel: TodoViewModel, navController: NavController
@@ -305,10 +304,10 @@ private class TodoListProviders : PreviewParameterProvider<List<TodoItem>> {
                 TodoItem(
                     "1",
                     "text = 1",
-                    TodoPriority.USUAL,
+                    TodoPriority.BASIC,
                     null,
                     false,
-                    LocalDate.now(),
+                    System.currentTimeMillis(),
                     null
                 ),
                 TodoItem(
@@ -316,19 +315,19 @@ private class TodoListProviders : PreviewParameterProvider<List<TodoItem>> {
                     "But I must explain to you how all this mistaken idea of denouncing" +
                             " pleasure and praising pain was born and I will give you a" +
                             " complete account of the system",
-                    TodoPriority.USUAL,
+                    TodoPriority.BASIC,
                     null,
                     false,
-                    LocalDate.now(),
+                    System.currentTimeMillis(),
                     null
                 ),
                 TodoItem(
                     "3",
                     "text = 3",
-                    TodoPriority.USUAL,
+                    TodoPriority.BASIC,
                     null,
                     true,
-                    LocalDate.now(),
+                    System.currentTimeMillis(),
                     null
                 )
             )

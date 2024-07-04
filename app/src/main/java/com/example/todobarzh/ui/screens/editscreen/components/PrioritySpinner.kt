@@ -89,7 +89,7 @@ fun PrioritySpinner(
 fun PrioritySpinnerPreview() {
     ToDoBarzhTheme {
         Surface(Modifier.background(color = ToDoBarzhTheme.colorScheme.backPrimary)) {
-            PrioritySpinner(TodoPriority.USUAL, {}, Modifier)
+            PrioritySpinner(TodoPriority.BASIC, {}, Modifier)
         }
     }
 }

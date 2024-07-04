@@ -29,10 +29,9 @@ import androidx.compose.ui.unit.dp
 import com.example.todobarzh.R
 import com.example.todobarzh.domain.model.TodoItem
 import com.example.todobarzh.domain.model.TodoPriority
-import com.example.todobarzh.ui.screens.common.toFormatString
+import com.example.todobarzh.ui.screens.common.toDateString
 import com.example.todobarzh.ui.theme.Green
 import com.example.todobarzh.ui.theme.ToDoBarzhTheme
-import java.time.LocalDate
 
 @Composable
 fun Todo(
@@ -89,7 +88,7 @@ fun Todo(
             )
             if (todo.deadline != null) {
                 Text(
-                    text = todo.deadline.toFormatString(),
+                    text = todo.deadline.toDateString(),
                     style = ToDoBarzhTheme.typography.subhead,
                     color = ToDoBarzhTheme.colorScheme.labelTertiary,
                     modifier = Modifier.padding(top = 10.dp)
@@ -131,10 +130,10 @@ private class TodoProviders : PreviewParameterProvider<TodoItem> {
             TodoItem(
                 "1",
                 "text = 1",
-                TodoPriority.USUAL,
+                TodoPriority.BASIC,
                 null,
                 false,
-                LocalDate.now(),
+                System.currentTimeMillis(),
                 null
             ),
             TodoItem(
@@ -142,10 +141,10 @@ private class TodoProviders : PreviewParameterProvider<TodoItem> {
                 "But I must explain to you how all this mistaken idea of denouncing" +
                         " pleasure and praising pain was born and I will give you a" +
                         " complete account of the system",
-                TodoPriority.USUAL,
-                LocalDate.of(2024, 7, 29),
+                TodoPriority.BASIC,
+                System.currentTimeMillis(),
                 true,
-                LocalDate.now(),
+                System.currentTimeMillis(),
                 null
             ),
         )

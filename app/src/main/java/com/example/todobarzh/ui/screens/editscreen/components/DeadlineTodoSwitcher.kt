@@ -24,26 +24,23 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import com.example.todobarzh.R
-import com.example.todobarzh.ui.screens.common.toDate
-import com.example.todobarzh.ui.screens.common.toFormatString
-import com.example.todobarzh.ui.screens.common.toLong
+import com.example.todobarzh.ui.screens.common.toDateString
 import com.example.todobarzh.ui.screens.editscreen.EditScreenEvent
 import com.example.todobarzh.ui.theme.Blue
 import com.example.todobarzh.ui.theme.ToDoBarzhTheme
-import java.time.LocalDate
 
 @Composable
 fun DeadlineTodoSwitcher(
-    deadlineDate: LocalDate?,
+    deadlineDate: Long?,
     onEvent: (EditScreenEvent) -> Unit,
     modifier: Modifier
 ) {
-    var checked: Boolean by remember { mutableStateOf(deadlineDate != null) }
+    var checked by remember { mutableStateOf(false) }
     var datePickerExpanded by remember { mutableStateOf(false) }
-
-    var deadlineDateText by remember {
-        mutableStateOf(deadlineDate?.toFormatString())
+    val deadlineDateText = remember(deadlineDate) {
+        deadlineDate?.toDateString() ?: ""
     }
+    if (deadlineDate != null) checked = true
 
     Row(modifier) {
         Column(
@@ -59,7 +56,7 @@ fun DeadlineTodoSwitcher(
             if (checked) {
                 Spacer(Modifier.height(4.dp))
                 Text(
-                    text = deadlineDateText ?: "",
+                    text = deadlineDateText,
                     style = ToDoBarzhTheme.typography.button,
                     color = Blue
                 )
@@ -68,7 +65,15 @@ fun DeadlineTodoSwitcher(
         Spacer(Modifier.weight(1f))
         Switch(
             checked = checked,
-            onCheckedChange = { checked = it },
+            onCheckedChange = {
+                checked = it
+                if (checked) {
+                    if (deadlineDate == null)
+                        onEvent.invoke(EditScreenEvent.UpdateDate(System.currentTimeMillis()))
+                } else {
+                    onEvent.invoke(EditScreenEvent.UpdateDate(null))
+                }
+            },
             colors = SwitchDefaults.colors(
                 checkedTrackColor = Blue,
                 uncheckedTrackColor = ToDoBarzhTheme.colorScheme.supportOverlay,
@@ -79,13 +84,12 @@ fun DeadlineTodoSwitcher(
     }
     if (datePickerExpanded) {
         TodoDatePicker(
-            date = deadlineDate?.toLong() ?: System.currentTimeMillis(),
+            date = deadlineDate ?: System.currentTimeMillis(),
             onConfirm = {
-                datePickerExpanded = !datePickerExpanded
-                onEvent.invoke(EditScreenEvent.UpdateDate(it.toDate()))
-                deadlineDateText = deadlineDate?.toFormatString()
+                datePickerExpanded = false
+                onEvent.invoke(EditScreenEvent.UpdateDate(it))
             },
-            onDismiss = { datePickerExpanded = !datePickerExpanded }
+            onDismiss = { datePickerExpanded = false }
         )
     }
 }
@@ -96,7 +100,7 @@ fun DeadlineTodoSwitcher(
     uiMode = Configuration.UI_MODE_NIGHT_NO,
 )
 @Composable
-fun DeadlineTodoSwitcherPreview(@PreviewParameter(DeadlineTodoProviders::class) date: LocalDate?) {
+fun DeadlineTodoSwitcherPreview(@PreviewParameter(DeadlineTodoProviders::class) date: Long?) {
     ToDoBarzhTheme {
         Surface(Modifier.background(color = ToDoBarzhTheme.colorScheme.backPrimary)) {
             DeadlineTodoSwitcher(date, {}, Modifier)
@@ -104,10 +108,10 @@ fun DeadlineTodoSwitcherPreview(@PreviewParameter(DeadlineTodoProviders::class) 
     }
 }
 
-private class DeadlineTodoProviders : PreviewParameterProvider<LocalDate?> {
-    override val values: Sequence<LocalDate?>
+private class DeadlineTodoProviders : PreviewParameterProvider<Long?> {
+    override val values: Sequence<Long?>
         get() = sequenceOf(
             null,
-            LocalDate.of(2025, 7, 23)
+            System.currentTimeMillis()
         )
 }
