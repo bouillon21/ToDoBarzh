@@ -46,6 +46,8 @@ import com.example.todobarzh.R
 import com.example.todobarzh.domain.model.TodoItem
 import com.example.todobarzh.domain.model.TodoPriority
 import com.example.todobarzh.ui.navigation.TodoNavRoute
+import com.example.todobarzh.ui.screens.common.ErrorScreen
+import com.example.todobarzh.ui.screens.common.LoadingScreen
 import com.example.todobarzh.ui.screens.common.getShadowTopAppBarModifier
 import com.example.todobarzh.ui.screens.mainscreen.components.Todo
 import com.example.todobarzh.ui.theme.Blue
@@ -179,8 +181,9 @@ fun MainScreenContent(viewState: TodoViewState, onEvent: (MainScreenEvent) -> Un
             }
         }
 
-        TodoViewState.Loading -> TODO()
-        TodoViewState.LoadingError -> TODO()
+        TodoViewState.Loading -> LoadingScreen()
+
+        is TodoViewState.LoadingError -> ErrorScreen(viewState.throwable, viewState.retry)
     }
 }
 

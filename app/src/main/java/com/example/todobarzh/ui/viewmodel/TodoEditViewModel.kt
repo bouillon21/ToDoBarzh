@@ -3,6 +3,7 @@ package com.example.todobarzh.ui.viewmodel
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.todobarzh.domain.model.BaseThrowable
 import com.example.todobarzh.domain.model.TodoPriority
 import com.example.todobarzh.domain.model.emptyTodoItem
 import com.example.todobarzh.domain.repository.TodoItemsRepository
@@ -25,56 +26,76 @@ class TodoEditViewModel @Inject constructor(
     private val id: String = savedStateHandle[EditScreenArg.TODO_ID] ?: EMPTY_ID
 
     private val mutableViewState =
-        MutableStateFlow(EditTodoViewState.Loaded(emptyTodoItem()))
+        MutableStateFlow<EditTodoViewState>(EditTodoViewState.Loading)
     val viewState: StateFlow<EditTodoViewState> = mutableViewState.asStateFlow()
+
+    private var item = emptyTodoItem()
 
     init {
         viewModelScope.launch {
             mutableViewState.update {
-                EditTodoViewState.Loaded(repository.findTodoItemById(id))
+                item = repository.findTodoItemById(id)
+                EditTodoViewState.Loaded(item)
             }
         }
     }
 
     fun saveTodo() {
         viewModelScope.launch {
-            val item = viewState.value as EditTodoViewState.Loaded
-            if (id == EMPTY_ID) {
-                repository.addTodo(item.todoItem)
-            } else {
-                repository.updateTodo(item.todoItem)
+            try {
+                if (id == EMPTY_ID) {
+                    repository.addTodo(item)
+                } else {
+                    repository.updateTodo(item)
+                }
+            } catch (throwable: BaseThrowable) {
+                mutableViewState.emit(EditTodoViewState.LoadingError(throwable) {
+                    viewModelScope.launch {
+                        if (id == EMPTY_ID) {
+                            repository.addTodo(item)
+                        } else {
+                            repository.updateTodo(item)
+                        }
+                        mutableViewState.emit(EditTodoViewState.Loaded(item))
+                    }
+                })
             }
         }
     }
 
     fun updateEditText(text: String) {
         mutableViewState.update {
-            EditTodoViewState.Loaded(
-                mutableViewState.value.todoItem.copy(text = text)
-            )
+            item = item.copy(text = text)
+            EditTodoViewState.Loaded(item)
         }
     }
 
     fun updateImportance(important: TodoPriority) {
         mutableViewState.update {
-            EditTodoViewState.Loaded(
-                mutableViewState.value.todoItem.copy(importance = important)
-            )
+            item = item.copy(importance = important)
+            EditTodoViewState.Loaded(item)
         }
     }
 
     fun updateDate(date: Long?) {
         mutableViewState.update {
-            EditTodoViewState.Loaded(
-                mutableViewState.value.todoItem.copy(deadline = date)
-            )
+            item = item.copy(deadline = date)
+            EditTodoViewState.Loaded(item)
         }
     }
 
     fun removeTodo() {
         viewModelScope.launch {
-            val item = viewState.value as EditTodoViewState.Loaded
-            repository.removeTodo(item.todoItem.id)
+            try {
+                repository.removeTodo(item.id)
+            } catch (throwable: BaseThrowable) {
+                mutableViewState.emit(EditTodoViewState.LoadingError(throwable) {
+                    viewModelScope.launch {
+                        repository.removeTodo(item.id)
+                        mutableViewState.emit(EditTodoViewState.Loaded(item))
+                    }
+                })
+            }
         }
     }
 

@@ -12,5 +12,6 @@ sealed class TodoViewState {
         val isVisibleCompleteTodo: Boolean = true
     ) : TodoViewState()
 
-    data object LoadingError : TodoViewState()
+    data class LoadingError(val throwable: BaseThrowable, val retry: () -> Unit) :
+        TodoViewState()
 }

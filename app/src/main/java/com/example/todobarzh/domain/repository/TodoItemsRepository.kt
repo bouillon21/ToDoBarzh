@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.StateFlow
 
 interface TodoItemsRepository {
 
-    val todoItems: StateFlow<List<TodoItem>>
+    suspend fun getItems(): StateFlow<List<TodoItem>>
 
     suspend fun findTodoItemById(id: String): TodoItem
 

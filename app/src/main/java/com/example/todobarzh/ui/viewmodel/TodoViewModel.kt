@@ -2,13 +2,14 @@ package com.example.todobarzh.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.todobarzh.domain.model.BaseThrowable
 import com.example.todobarzh.domain.repository.TodoItemsRepository
 import com.example.todobarzh.ui.viewstate.TodoViewState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -17,30 +18,57 @@ import javax.inject.Inject
 class TodoViewModel @Inject constructor(
     private val repository: TodoItemsRepository
 ) : ViewModel() {
-    private val mutableViewState = MutableStateFlow(TodoViewState.Loaded())
+    private var mutableViewState = MutableStateFlow<TodoViewState>(TodoViewState.Loading)
+    val viewState: StateFlow<TodoViewState> = mutableViewState.asStateFlow()
+
     private val isVisibleCompleteTodo = MutableStateFlow(true)
 
-    val viewState = combine(
-        mutableViewState,
-        repository.todoItems,
-        isVisibleCompleteTodo
-    ) { state, tasks, isVisible ->
-        state.copy(
-            todoItems = tasks.filter { !it.isComplete or isVisible },
-            countCompleted = repository.getCountCompleteTodo(),
-            isVisibleCompleteTodo = isVisible,
-        )
-    }.stateIn(
-        viewModelScope,
-        SharingStarted.WhileSubscribed(5000),
-        TodoViewState.Loaded()
-    )
+    init {
+        viewModelScope.launch {
+            try {
+                getTodoList()
+            } catch (throwable: BaseThrowable) {
+                mutableViewState.emit(TodoViewState.LoadingError(throwable) {
+                    getTodoList()
+                })
+            }
+        }
+    }
+
+
+    private fun getTodoList() {
+        viewModelScope.launch {
+            repository.getItems()
+                .combine(isVisibleCompleteTodo) { todoItemList, doneTasksVisibility ->
+                    todoItemList.filter { !it.isComplete or doneTasksVisibility }
+                }.collect {
+                    mutableViewState.emit(
+                        TodoViewState.Loaded(
+                            it,
+                            repository.getCountCompleteTodo(),
+                            isVisibleCompleteTodo.value
+                        )
+                    )
+                }
+        }
+    }
 
     fun onTodoCheckChangePressed(todoId: String, checked: Boolean) {
         viewModelScope.launch {
-            val item = repository.findTodoItemById(todoId).copy(isComplete = checked)
-            repository.changeCheckTodo(item)
+            try {
+                val item = repository.findTodoItemById(todoId).copy(isComplete = checked)
+                repository.changeCheckTodo(item)
+            } catch (throwable: BaseThrowable) {
+                mutableViewState.emit(TodoViewState.LoadingError(throwable) {
+                    viewModelScope.launch {
+                        val item = repository.findTodoItemById(todoId).copy(isComplete = checked)
+                        repository.changeCheckTodo(item)
+                        getTodoList()
+                    }
+                })
+            }
         }
+
     }
 
     fun onCompleteTodoVisibleChangePressed() {

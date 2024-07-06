@@ -28,6 +28,8 @@ import androidx.navigation.NavController
 import com.example.todobarzh.R
 import com.example.todobarzh.domain.model.TodoPriority
 import com.example.todobarzh.domain.model.emptyTodoItem
+import com.example.todobarzh.ui.screens.common.ErrorScreen
+import com.example.todobarzh.ui.screens.common.LoadingScreen
 import com.example.todobarzh.ui.screens.common.getShadowTopAppBarModifier
 import com.example.todobarzh.ui.screens.editscreen.components.DeadlineTodoSwitcher
 import com.example.todobarzh.ui.screens.editscreen.components.DeleteButton
@@ -162,8 +164,12 @@ fun EditScreenContent(viewState: EditTodoViewState, onEvent: (EditScreenEvent) -
                 }
             }
 
-            EditTodoViewState.Loading -> TODO()
-            EditTodoViewState.LoadingError -> TODO()
+            EditTodoViewState.Loading -> LoadingScreen()
+
+            is EditTodoViewState.LoadingError -> ErrorScreen(
+                throwable = viewState.throwable,
+                viewState.retry
+            )
         }
     }
 }

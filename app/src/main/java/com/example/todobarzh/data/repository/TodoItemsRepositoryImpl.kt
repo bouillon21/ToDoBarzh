@@ -4,30 +4,26 @@ import com.example.todobarzh.data.source.DataSource
 import com.example.todobarzh.domain.model.TodoItem
 import com.example.todobarzh.domain.model.emptyTodoItem
 import com.example.todobarzh.domain.repository.TodoItemsRepository
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class TodoItemsRepositoryImpl @Inject constructor(
     dataSource: DataSource
 ) : TodoItemsRepository {
-
     private val mutableTodoItems = MutableStateFlow<List<TodoItem>>(emptyList())
-    override val todoItems: StateFlow<List<TodoItem>> = mutableTodoItems.asStateFlow()
     private val source = dataSource
 
-    init {
-        CoroutineScope(Dispatchers.IO).launch {
-            dataSource.getItems().collect {
-                mutableTodoItems.emit(it)
-            }
+    override suspend fun getItems(): StateFlow<List<TodoItem>> {
+        val item = source.getItems()
+        item.collect {
+            mutableTodoItems.emit(it)
         }
+        return mutableTodoItems.asStateFlow()
     }
 
     override suspend fun getCountCompleteTodo(): Int = withContext(Dispatchers.IO) {
