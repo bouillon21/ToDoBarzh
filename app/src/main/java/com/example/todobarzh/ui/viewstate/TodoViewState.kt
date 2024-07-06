@@ -1,5 +1,6 @@
 package com.example.todobarzh.ui.viewstate
 
+import com.example.todobarzh.domain.model.BaseThrowable
 import com.example.todobarzh.domain.model.TodoItem
 
 sealed class TodoViewState {
