@@ -14,7 +14,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.todobarzh.R
-import com.example.todobarzh.ui.screens.common.toLong
 import com.example.todobarzh.ui.theme.Blue
 import com.example.todobarzh.ui.theme.ToDoBarzhTheme
 import com.example.todobarzh.ui.theme.White
@@ -113,6 +112,6 @@ fun TodoDatePicker(
 @Composable
 fun TodoDatePickerPreview() {
     ToDoBarzhTheme {
-        TodoDatePicker(LocalDate.now().toLong(), { }, {})
+        TodoDatePicker(System.currentTimeMillis(), { }, {})
     }
 }

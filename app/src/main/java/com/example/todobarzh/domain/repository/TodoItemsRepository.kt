@@ -1,12 +1,11 @@
 package com.example.todobarzh.domain.repository
 
 import com.example.todobarzh.domain.model.TodoItem
-import kotlinx.coroutines.flow.SharedFlow
-
+import kotlinx.coroutines.flow.StateFlow
 
 interface TodoItemsRepository {
 
-    fun getTodoItems(): SharedFlow<List<TodoItem>>
+    suspend fun getItems(): StateFlow<List<TodoItem>>
 
     suspend fun findTodoItemById(id: String): TodoItem
 
@@ -16,7 +15,7 @@ interface TodoItemsRepository {
 
     suspend fun addTodo(item: TodoItem)
 
-    suspend fun changeCheckTodo(todoId: String, checked: Boolean)
+    suspend fun changeCheckTodo(item: TodoItem)
 
     suspend fun removeTodo(todoId: String)
 }

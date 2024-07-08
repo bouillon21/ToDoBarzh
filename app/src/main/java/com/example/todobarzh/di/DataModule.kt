@@ -1,8 +1,8 @@
 package com.example.todobarzh.di
 
+import com.example.todobarzh.data.source.NetworkDataSource
 import com.example.todobarzh.data.repository.TodoItemsRepositoryImpl
 import com.example.todobarzh.domain.repository.TodoItemsRepository
-import com.example.todobarzh.data.source.MockDataSource
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -14,11 +14,11 @@ import javax.inject.Singleton
 object DataModule {
     @Singleton
     @Provides
-    fun provideMockDataSource() = MockDataSource()
+    fun provideNetworkDataSource() = NetworkDataSource.create()
 
     @Singleton
     @Provides
     fun provideTodoItemsRepository(
-        mockProvide: MockDataSource
-    ): TodoItemsRepository = TodoItemsRepositoryImpl(mockProvide)
+        networkProvider: NetworkDataSource
+    ): TodoItemsRepository = TodoItemsRepositoryImpl(networkProvider)
 }

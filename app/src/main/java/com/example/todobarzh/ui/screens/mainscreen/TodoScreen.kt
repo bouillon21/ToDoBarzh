@@ -45,15 +45,16 @@ import androidx.navigation.NavController
 import com.example.todobarzh.R
 import com.example.todobarzh.domain.model.TodoItem
 import com.example.todobarzh.domain.model.TodoPriority
-import com.example.todobarzh.ui.screens.common.getShadowTopAppBarModifier
 import com.example.todobarzh.ui.navigation.TodoNavRoute
+import com.example.todobarzh.ui.screens.common.ErrorScreen
+import com.example.todobarzh.ui.screens.common.LoadingScreen
+import com.example.todobarzh.ui.screens.common.getShadowTopAppBarModifier
 import com.example.todobarzh.ui.screens.mainscreen.components.Todo
 import com.example.todobarzh.ui.theme.Blue
 import com.example.todobarzh.ui.theme.ToDoBarzhTheme
 import com.example.todobarzh.ui.theme.White
 import com.example.todobarzh.ui.viewmodel.TodoViewModel
 import com.example.todobarzh.ui.viewstate.TodoViewState
-import java.time.LocalDate
 
 private fun onEvent(
     action: MainScreenEvent, viewModel: TodoViewModel, navController: NavController
@@ -106,20 +107,13 @@ fun MainScreenContent(viewState: TodoViewState, onEvent: (MainScreenEvent) -> Un
         is TodoViewState.Loaded -> {
             val stateCounterComplete = stringResource(
                 R.string.completeTodoTemplate,
-                viewState.todoItems.count { it.isComplete })
+                viewState.countCompleted
+            )
             val stateStyleTitle =
                 if (appBarState.collapsedFraction < 0.5f) {
                     ToDoBarzhTheme.typography.largeTitle
                 } else {
                     ToDoBarzhTheme.typography.title
-                }
-            val filteredVisibleItem =
-                viewState.todoItems.filter {
-                    if (!viewState.isVisibleCompleteTodo) {
-                        !it.isComplete
-                    } else {
-                        true
-                    }
                 }
             Scaffold(
                 topBar = {
@@ -166,7 +160,7 @@ fun MainScreenContent(viewState: TodoViewState, onEvent: (MainScreenEvent) -> Un
                 floatingActionButton = {
                     FloatingActionButton(
                         onClick = {
-                            onEvent.invoke(MainScreenEvent.NewItemPressed)
+                            onEvent(MainScreenEvent.NewItemPressed)
                         }, containerColor = Blue, contentColor = White
                     ) {
                         Icon(Icons.Default.Add, contentDescription = "Add")
@@ -182,13 +176,14 @@ fun MainScreenContent(viewState: TodoViewState, onEvent: (MainScreenEvent) -> Un
                         .padding(contentPadding)
                         .padding(horizontal = 8.dp)
                 ) {
-                    TodoList(filteredVisibleItem, onEvent)
+                    TodoList(viewState.todoItems, onEvent)
                 }
             }
         }
 
-        TodoViewState.Loading -> TODO()
-        TodoViewState.LoadingError -> TODO()
+        TodoViewState.Loading -> LoadingScreen()
+
+        is TodoViewState.LoadingError -> ErrorScreen(viewState.throwable, viewState.retry)
     }
 }
 
@@ -206,7 +201,7 @@ fun EyeButton(
         }
 
     IconButton(
-        onClick = { onEvent.invoke(MainScreenEvent.CompleteTodoVisibleChangePressed) },
+        onClick = { onEvent(MainScreenEvent.CompleteTodoVisibleChangePressed) },
         modifier = modifier
     ) {
         Icon(
@@ -231,9 +226,9 @@ fun TodoList(todoItems: List<TodoItem>, onEvent: (MainScreenEvent) -> Unit) {
             items(todoItems) { todo ->
                 Todo(
                     todo = todo,
-                    onClick = { todoId -> onEvent.invoke(MainScreenEvent.TodoEditPressed(todoId)) },
+                    onClick = { todoId -> onEvent(MainScreenEvent.TodoEditPressed(todoId)) },
                     onClickCheckbox = { todoId, checked ->
-                        onEvent.invoke(
+                        onEvent(
                             MainScreenEvent.TodoCheckChangePressed(todoId, checked)
                         )
                     },
@@ -249,7 +244,7 @@ fun TodoList(todoItems: List<TodoItem>, onEvent: (MainScreenEvent) -> Unit) {
 @Composable
 fun NewTodo(onEvent: (MainScreenEvent) -> Unit) {
     Column(Modifier.clickable {
-        onEvent.invoke(MainScreenEvent.NewItemPressed)
+        onEvent(MainScreenEvent.NewItemPressed)
     }) {
         Spacer(Modifier.height(12.dp))
         Row(
@@ -283,7 +278,7 @@ fun NewTodo(onEvent: (MainScreenEvent) -> Unit) {
 @Composable
 fun MainScreenContentPreview(@PreviewParameter(TodoListProviders::class) todoItems: List<TodoItem>) {
     ToDoBarzhTheme {
-        MainScreenContent(TodoViewState.Loaded(todoItems, true), { _ -> })
+        MainScreenContent(TodoViewState.Loaded(todoItems, 0, true), { _ -> })
     }
 }
 
@@ -312,10 +307,10 @@ private class TodoListProviders : PreviewParameterProvider<List<TodoItem>> {
                 TodoItem(
                     "1",
                     "text = 1",
-                    TodoPriority.USUAL,
+                    TodoPriority.BASIC,
                     null,
                     false,
-                    LocalDate.now(),
+                    System.currentTimeMillis(),
                     null
                 ),
                 TodoItem(
@@ -323,19 +318,19 @@ private class TodoListProviders : PreviewParameterProvider<List<TodoItem>> {
                     "But I must explain to you how all this mistaken idea of denouncing" +
                             " pleasure and praising pain was born and I will give you a" +
                             " complete account of the system",
-                    TodoPriority.USUAL,
+                    TodoPriority.BASIC,
                     null,
                     false,
-                    LocalDate.now(),
+                    System.currentTimeMillis(),
                     null
                 ),
                 TodoItem(
                     "3",
                     "text = 3",
-                    TodoPriority.USUAL,
+                    TodoPriority.BASIC,
                     null,
                     true,
-                    LocalDate.now(),
+                    System.currentTimeMillis(),
                     null
                 )
             )
