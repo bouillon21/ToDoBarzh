@@ -278,7 +278,7 @@ fun NewTodo(onEvent: (MainScreenEvent) -> Unit) {
 @Composable
 fun MainScreenContentPreview(@PreviewParameter(TodoListProviders::class) todoItems: List<TodoItem>) {
     ToDoBarzhTheme {
-        MainScreenContent(TodoViewState.Loaded(todoItems, 0, true), { _ -> })
+        MainScreenContent(TodoViewState.Loaded(todoItems, 0, true, ""), { _ -> })
     }
 }
 
