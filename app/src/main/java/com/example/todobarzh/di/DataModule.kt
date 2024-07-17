@@ -2,6 +2,7 @@ package com.example.todobarzh.di
 
 import android.content.Context
 import androidx.room.Room
+import com.example.todobarzh.ThemeSetting
 import com.example.todobarzh.data.repository.TodoItemsRepositoryImpl
 import com.example.todobarzh.data.room.TodoDao
 import com.example.todobarzh.data.room.TodoDatabase
@@ -29,6 +30,12 @@ object DataModule {
         networkProvider: NetworkDataSource,
         localProvider: TodoDao,
     ): TodoItemsRepository = TodoItemsRepositoryImpl(networkProvider, localProvider)
+
+    @Singleton
+    @Provides
+    fun provideAppUserStorage(@ApplicationContext context: Context): ThemeSetting {
+        return ThemeSetting(context = context)
+    }
 
     @Singleton
     @Provides

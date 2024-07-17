@@ -72,8 +72,13 @@ private fun onEvent(
             navController.navigate(TodoNavRoute.Edit.withArgs(action.todoId))
         }
 
-        MainScreenEvent.CompleteTodoVisibleChangePressed ->
+        MainScreenEvent.CompleteTodoVisibleChangePressed -> {
             viewModel.onCompleteTodoVisibleChangePressed()
+        }
+
+        MainScreenEvent.SettingsPressed -> {
+            navController.navigate(TodoNavRoute.Settings.route)
+        }
     }
 }
 
@@ -86,6 +91,8 @@ sealed interface MainScreenEvent {
     data class TodoEditPressed(val todoId: String) : MainScreenEvent
 
     data object CompleteTodoVisibleChangePressed : MainScreenEvent
+
+    data object SettingsPressed : MainScreenEvent
 }
 
 @Composable
@@ -136,11 +143,17 @@ fun MainScreenContent(viewState: TodoViewState, onEvent: (MainScreenEvent) -> Un
                                             style = ToDoBarzhTheme.typography.body,
                                             color = ToDoBarzhTheme.colorScheme.labelTertiary,
                                         )
-                                        EyeButton(
-                                            viewState.isVisibleCompleteTodo,
-                                            onEvent,
-                                            Modifier.padding(end = 4.dp)
-                                        )
+                                        Row {
+                                            EyeButton(
+                                                viewState.isVisibleCompleteTodo,
+                                                onEvent,
+                                                Modifier
+                                            )
+                                            SettingsButton(
+                                                onEvent,
+                                                Modifier.padding(end = 4.dp)
+                                            )
+                                        }
                                     }
                                 }
                             }
@@ -184,6 +197,23 @@ fun MainScreenContent(viewState: TodoViewState, onEvent: (MainScreenEvent) -> Un
         TodoViewState.Loading -> LoadingScreen()
 
         is TodoViewState.LoadingError -> ErrorScreen(viewState.throwable, viewState.retry)
+    }
+}
+
+@Composable
+fun SettingsButton(
+    onEvent: (MainScreenEvent) -> Unit,
+    modifier: Modifier
+) {
+    IconButton(
+        onClick = { onEvent(MainScreenEvent.SettingsPressed) },
+        modifier = modifier
+    ) {
+        Icon(
+            painter = painterResource(id = R.drawable.ic_settings),
+            tint = Blue,
+            contentDescription = null,
+        )
     }
 }
 

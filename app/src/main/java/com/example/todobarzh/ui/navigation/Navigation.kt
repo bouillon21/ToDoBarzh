@@ -10,6 +10,7 @@ import androidx.navigation.navArgument
 import com.example.todobarzh.ui.screens.editscreen.EditScreen
 import com.example.todobarzh.ui.screens.editscreen.EditScreenArg
 import com.example.todobarzh.ui.screens.mainscreen.MainScreen
+import com.example.todobarzh.ui.screens.settingsscreen.SettingsScreen
 
 @Composable
 fun Navigation() {
@@ -31,6 +32,9 @@ fun Navigation() {
         }
         composable(TodoNavRoute.New.route) {
             EditScreen(navController, hiltViewModel())
+        }
+        composable(TodoNavRoute.Settings.route) {
+            SettingsScreen(navController, hiltViewModel())
         }
     }
 }

@@ -10,4 +10,9 @@
     <string name="confirm_button_date_picker_dialog">ГОТОВО</string>
     <string name="dismiss_button_date_picker_dialog">ОТМЕНА</string>
     <string name="completeTodoTemplate">Выполнено — %1$s</string>
+    <string name="setting_screen_title">Настройки</string>
+    <string name="theme_title">Тема в приложении:</string>
+    <string name="dark_theme_title">Тёмная тема</string>
+    <string name="light_theme_title">Светлая тема</string>
+    <string name="system_theme_title">Как в системе</string>
 </resources>
