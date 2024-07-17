@@ -9,7 +9,8 @@ data class TodoItem(
     val deadline: Long? = null,
     val isComplete: Boolean,
     val dateCreate: Long,
-    val dateEdit: Long? = null
+    val dateEdit: Long? = null,
+    val isSynchronized: Boolean = false
 )
 
 fun emptyTodoItem(): TodoItem {

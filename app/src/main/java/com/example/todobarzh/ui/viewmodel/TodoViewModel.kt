@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.todobarzh.domain.model.BaseThrowable
 import com.example.todobarzh.domain.repository.TodoItemsRepository
+import com.example.todobarzh.ui.ErrorPresenter
 import com.example.todobarzh.ui.viewstate.TodoViewState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,29 +25,23 @@ class TodoViewModel @Inject constructor(
     private val isVisibleCompleteTodo = MutableStateFlow(true)
 
     init {
-        viewModelScope.launch {
-            try {
-                getTodoList()
-            } catch (throwable: BaseThrowable) {
-                mutableViewState.emit(TodoViewState.LoadingError(throwable) {
-                    getTodoList()
-                })
-            }
-        }
+        getTodoList()
     }
-
 
     private fun getTodoList() {
         viewModelScope.launch {
             repository.getItems()
-                .combine(isVisibleCompleteTodo) { todoItemList, doneTasksVisibility ->
+                .combine(
+                    isVisibleCompleteTodo
+                ) { todoItemList, doneTasksVisibility ->
                     todoItemList.filter { !it.isComplete or doneTasksVisibility }
                 }.collect {
                     mutableViewState.emit(
                         TodoViewState.Loaded(
                             it,
                             repository.getCountCompleteTodo(),
-                            isVisibleCompleteTodo.value
+                            isVisibleCompleteTodo.value,
+                            er = repository.error.value?.let { error -> ErrorPresenter(error).description }
                         )
                     )
                 }
