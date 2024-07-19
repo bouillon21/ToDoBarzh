@@ -31,10 +31,10 @@ import com.example.todobarzh.domain.model.emptyTodoItem
 import com.example.todobarzh.ui.screens.common.ErrorScreen
 import com.example.todobarzh.ui.screens.common.LoadingScreen
 import com.example.todobarzh.ui.screens.common.getShadowTopAppBarModifier
+import com.example.todobarzh.ui.screens.editscreen.components.BottomSheet
 import com.example.todobarzh.ui.screens.editscreen.components.DeadlineTodoSwitcher
 import com.example.todobarzh.ui.screens.editscreen.components.DeleteButton
 import com.example.todobarzh.ui.screens.editscreen.components.EditTextTodo
-import com.example.todobarzh.ui.screens.editscreen.components.PrioritySpinner
 import com.example.todobarzh.ui.theme.Blue
 import com.example.todobarzh.ui.theme.ToDoBarzhTheme
 import com.example.todobarzh.ui.viewmodel.TodoEditViewModel
@@ -145,7 +145,7 @@ fun EditScreenContent(viewState: EditTodoViewState, onEvent: (EditScreenEvent) -
                         .nestedScroll(scrollBehavior.nestedScrollConnection)
                 ) {
                     EditTextTodo(viewState.todoItem.text, onEvent, Modifier.padding(16.dp))
-                    PrioritySpinner(viewState.todoItem.importance, onEvent, Modifier.padding(16.dp))
+                    BottomSheet(viewState.todoItem.importance, onEvent, Modifier.padding(16.dp))
                     HorizontalDivider(
                         thickness = 1.dp,
                         color = ToDoBarzhTheme.colorScheme.supportSeparator,
