@@ -1,22 +1,26 @@
 package com.example.todobarzh.ui.navigation
 
+import android.view.View
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.todobarzh.divkit.screens.AboutScreen
 import com.example.todobarzh.ui.screens.editscreen.EditScreen
 import com.example.todobarzh.ui.screens.editscreen.EditScreenArg
 import com.example.todobarzh.ui.screens.mainscreen.MainScreen
 import com.example.todobarzh.ui.screens.settingsscreen.SettingsScreen
 
 @Composable
-fun Navigation() {
-    val navController = rememberNavController()
+fun Navigation(
+    divScreenProvider: (jsonName: String) -> View,
+    navController: NavHostController
+) {
     NavHost(
         navController = navController,
         startDestination = TodoNavRoute.Home.route,
@@ -61,6 +65,12 @@ fun Navigation() {
         }
         composable(TodoNavRoute.Settings.route) {
             SettingsScreen(navController, hiltViewModel())
+        }
+
+        composable(TodoNavRoute.About.route) {
+            AboutScreen(
+                aboutScreen = divScreenProvider.invoke("about_screen.json")
+            )
         }
     }
 }

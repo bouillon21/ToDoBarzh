@@ -1,8 +1,11 @@
 package com.example.todobarzh.ui.screens.settingsscreen
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
@@ -25,6 +28,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.todobarzh.AppThemeMode
 import com.example.todobarzh.R
+import com.example.todobarzh.ui.navigation.TodoNavRoute
+import com.example.todobarzh.ui.screens.settingsscreen.components.AboutUiItem
 import com.example.todobarzh.ui.screens.settingsscreen.components.ThemeSpinner
 import com.example.todobarzh.ui.theme.ToDoBarzhTheme
 import com.example.todobarzh.ui.viewmodel.SettingsViewModel
@@ -40,6 +45,8 @@ private fun onEvent(
         is SettingsScreenEvent.ChangeTheme -> {
             viewModel.changeThemeMode(action.themeMode)
         }
+
+        SettingsScreenEvent.OpenAboutScreen -> navController.navigate(TodoNavRoute.About.route)
     }
 }
 
@@ -48,6 +55,8 @@ sealed interface SettingsScreenEvent {
     data object Exit : SettingsScreenEvent
 
     data class ChangeTheme(val themeMode: AppThemeMode) : SettingsScreenEvent
+
+    data object OpenAboutScreen : SettingsScreenEvent
 }
 
 @Composable
@@ -100,6 +109,13 @@ fun SettingsScreenContent(state: AppThemeMode, onEvent: (SettingsScreenEvent) ->
         ) {
             ThemeSpinner(
                 state, onEvent, Modifier
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            HorizontalDivider(color = ToDoBarzhTheme.colorScheme.supportSeparator)
+            AboutUiItem(
+                onClick = {
+                    onEvent.invoke(SettingsScreenEvent.OpenAboutScreen)
+                },
             )
         }
     }

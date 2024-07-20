@@ -17,8 +17,18 @@ roomKtx = "2.7.0-alpha05"
 appcompat = "1.7.0"
 animation = "1.6.8"
 composeNavigation = "2.8.0-alpha08"
+divkit = "30.9.0"
 
 [libraries]
+div-core = { module = "com.yandex.div:div-core", version.ref = "divkit" }
+div = { module = "com.yandex.div:div", version.ref = "divkit" }
+div-json = { module = "com.yandex.div:div-json", version.ref = "divkit" }
+picasso = { module = "com.yandex.div:picasso", version.ref = "divkit" }
+div-rive = { module = "com.yandex.div:div-rive", version.ref = "divkit" }
+utils = { module = "com.yandex.div:utils", version.ref = "divkit" }
+div-pinch-to-zoom = { module = "com.yandex.div:div-pinch-to-zoom", version.ref = "divkit" }
+
+
 navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "composeNavigation" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
