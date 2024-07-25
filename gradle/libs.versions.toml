@@ -14,11 +14,25 @@ lifecycleRuntimeKtx = "2.8.2"
 activityCompose = "1.9.0"
 composeBom = "2024.06.00"
 roomKtx = "2.7.0-alpha05"
+appcompat = "1.7.0"
+animation = "1.6.8"
+composeNavigation = "2.8.0-alpha08"
+divkit = "30.9.0"
 
 [libraries]
+div-core = { module = "com.yandex.div:div-core", version.ref = "divkit" }
+div = { module = "com.yandex.div:div", version.ref = "divkit" }
+div-json = { module = "com.yandex.div:div-json", version.ref = "divkit" }
+picasso = { module = "com.yandex.div:picasso", version.ref = "divkit" }
+div-rive = { module = "com.yandex.div:div-rive", version.ref = "divkit" }
+utils = { module = "com.yandex.div:utils", version.ref = "divkit" }
+div-pinch-to-zoom = { module = "com.yandex.div:div-pinch-to-zoom", version.ref = "divkit" }
+
+
+navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "composeNavigation" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
-
+androidx-animation = { module = "androidx.compose.animation:animation", version.ref = "animation" }
 androidx-lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycleRuntimeKtx" }
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomKtx" }
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "roomKtx" }
@@ -39,6 +53,7 @@ androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-toolin
 androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

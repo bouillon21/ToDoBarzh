@@ -61,6 +61,8 @@ class TodoItemsRepositoryImpl @Inject constructor(
         val networkItemsMap = hashMapOf<String, TodoItem>()
         networkItems.forEach { item -> networkItemsMap[item.id] = item }
 
+        localSource.upsertTasks(networkItems.map { it.toNetwork().copy(isSynchronized = true) })
+
         for (item in notSynchronizedItems) {
             if (item.id in networkItemsMap.keys) {
                 if (item.isDeleted) {

@@ -52,7 +52,8 @@ android {
 }
 
 dependencies {
-
+    implementation(libs.navigation.compose)
+    implementation(libs.androidx.animation)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -61,6 +62,7 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.appcompat)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -80,4 +82,12 @@ dependencies {
     // Room
     implementation(libs.androidx.room.ktx)
     kapt(libs.androidx.room.compiler)
+
+    implementation(libs.div.core)
+    implementation(libs.div)
+    implementation(libs.div.json)
+    implementation(libs.utils)
+    implementation(libs.picasso)
+    implementation(libs.div.rive)
+    implementation(libs.div.pinch.to.zoom)
 }
