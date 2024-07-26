@@ -20,6 +20,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -53,11 +58,22 @@ fun Todo(
         ToDoBarzhTheme.colorScheme.labelPrimary
     }
 
+    val todoCheckedDescription =
+        if (checked) stringResource(R.string.done) else stringResource(R.string.not_done)
+    val todoImportanceState = todo.importance.value
+    val todoStateDescription =
+        stringResource(R.string.todo_state_description, todoCheckedDescription, todoImportanceState)
+    val todoContent = stringResource(R.string.todo_text_description, todo.text)
+
     Row(
         verticalAlignment = Alignment.Top,
         modifier = Modifier
             .clickable {
                 onClick.invoke(todo.id)
+            }
+            .semantics(mergeDescendants = true) {
+                stateDescription = todoStateDescription
+                contentDescription = todoContent
             }
             .padding(vertical = 12.dp, horizontal = 16.dp)
     ) {
@@ -85,6 +101,7 @@ fun Todo(
                 style = textStyle,
                 maxLines = 3,
                 overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.clearAndSetSemantics {}
             )
             if (todo.deadline != null) {
                 Text(

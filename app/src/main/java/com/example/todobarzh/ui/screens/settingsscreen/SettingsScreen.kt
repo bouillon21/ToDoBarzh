@@ -89,7 +89,7 @@ fun SettingsScreenContent(state: AppThemeMode, onEvent: (SettingsScreenEvent) ->
                         Icon(
                             painter = painterResource(id = R.drawable.ic_cross),
                             tint = ToDoBarzhTheme.colorScheme.labelPrimary,
-                            contentDescription = "exit"
+                            contentDescription = stringResource(R.string.undo_todo_list_screen_description)
                         )
                     }
                 },
@@ -107,9 +107,7 @@ fun SettingsScreenContent(state: AppThemeMode, onEvent: (SettingsScreenEvent) ->
                 .padding(contentPadding)
                 .padding(8.dp)
         ) {
-            ThemeSpinner(
-                state, onEvent, Modifier
-            )
+            ThemeSpinner(state, onEvent, Modifier)
             Spacer(modifier = Modifier.height(16.dp))
             HorizontalDivider(color = ToDoBarzhTheme.colorScheme.supportSeparator)
             AboutUiItem(
