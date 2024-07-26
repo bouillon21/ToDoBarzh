@@ -19,6 +19,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
@@ -42,7 +44,10 @@ fun DeadlineTodoSwitcher(
     }
     if (deadlineDate != null) checked = true
 
-    Row(modifier) {
+    val deadlineState = if (checked) stringResource(R.string.enable_deadline) else
+        stringResource(R.string.disable_deadline)
+
+    Row(modifier.semantics { contentDescription = deadlineState }) {
         Column(
             Modifier
                 .align(Alignment.CenterVertically)

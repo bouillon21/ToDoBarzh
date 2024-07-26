@@ -38,6 +38,7 @@ fun ThemeSpinner(
 ) {
     var expanded by remember { mutableStateOf(false) }
 
+    val themeLabelDescription = stringResource(R.string.change_theme)
     Column(
         modifier
             .fillMaxWidth()
@@ -46,7 +47,7 @@ fun ThemeSpinner(
                 color = ToDoBarzhTheme.colorScheme.backSecondary
             )
             .padding(8.dp)
-            .clickable { expanded = true }) {
+            .clickable(onClickLabel = themeLabelDescription) { expanded = true }) {
         Text(
             text = stringResource(R.string.theme_title),
             style = ToDoBarzhTheme.typography.body,

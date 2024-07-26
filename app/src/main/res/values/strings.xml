@@ -15,4 +15,21 @@
     <string name="dark_theme_title">Тёмная тема</string>
     <string name="light_theme_title">Светлая тема</string>
     <string name="system_theme_title">Как в системе</string>
+    <string name="create_new_todo_screen">Перейти на экран создания нового дела</string>
+    <string name="filter_complete_todo_descriprion">Скрыть выполненные дела</string>
+    <string name="no_filter_complete_todo_descriprion">Показать выполненные дела</string>
+    <string name="settings_sceen_description">Перейти на экран настроек</string>
+    <string name="done">выполнена</string>
+    <string name="not_done">не выполнена</string>
+    <string name="todo_state_description">Состояние: %1$s. Важность: %2$s</string>
+    <string name="todo_text_description">Текст задачи: %1$s</string>
+    <string name="info_button_description">перейти на страницу об авторе</string>
+    <string name="save_button_description">Сохранить задачу и заркыть экран редактирования</string>
+    <string name="undo_todo_list_screen_description">Перейти обратно на экран списка заметок</string>
+    <string name="delete_button_description">Удалить задачу и заркыть экран</string>
+    <string name="change_importance">изменить важность</string>
+    <string name="change_theme">изменить тему приложения</string>
+    <string name="change_deadline">изменить дедлайн</string>
+    <string name="enable_deadline">дедлайн включен</string>
+    <string name="disable_deadline">дедлайн выключен</string>
 </resources>

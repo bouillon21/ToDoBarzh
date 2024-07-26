@@ -56,10 +56,11 @@ fun BottomSheet(
         label = "basicTextFieldBackgroundColor"
     )
 
+    val labelImportanceDescription = stringResource(R.string.change_importance)
     Column(
         modifier
             .fillMaxWidth()
-            .clickable { showBottomSheet.value = true }
+            .clickable(onClickLabel = labelImportanceDescription) { showBottomSheet.value = true }
             .border(
                 BorderStroke(1.dp, basicTextFieldBackgroundColor),
                 RoundedCornerShape(3.dp),

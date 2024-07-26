@@ -36,6 +36,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.isTraversalGroup
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -176,12 +179,16 @@ fun MainScreenContent(viewState: TodoViewState, onEvent: (MainScreenEvent) -> Un
                             onEvent(MainScreenEvent.NewItemPressed)
                         }, containerColor = Blue, contentColor = White
                     ) {
-                        Icon(Icons.Default.Add, contentDescription = "Add")
+                        Icon(
+                            Icons.Default.Add,
+                            contentDescription = stringResource(R.string.create_new_todo_screen)
+                        )
                     }
                 },
                 containerColor = ToDoBarzhTheme.colorScheme.backPrimary,
                 modifier = Modifier
                     .fillMaxSize()
+                    .semantics { isTraversalGroup = true }
                     .nestedScroll(scrollBehavior.nestedScrollConnection)
             ) { contentPadding ->
                 Column(
@@ -212,7 +219,7 @@ fun SettingsButton(
         Icon(
             painter = painterResource(id = R.drawable.ic_settings),
             tint = Blue,
-            contentDescription = null,
+            contentDescription = stringResource(R.string.settings_sceen_description),
         )
     }
 }
@@ -225,9 +232,16 @@ fun EyeButton(
 ) {
     val painterEye =
         if (isVisibleCompleteTodo) {
-            painterResource(id = R.drawable.ic_eye)
-        } else {
             painterResource(id = R.drawable.ic_eye_off)
+        } else {
+            painterResource(id = R.drawable.ic_eye)
+        }
+
+    val contentDescription =
+        if (isVisibleCompleteTodo) {
+            stringResource(R.string.filter_complete_todo_descriprion)
+        } else {
+            stringResource(R.string.no_filter_complete_todo_descriprion)
         }
 
     IconButton(
@@ -237,7 +251,7 @@ fun EyeButton(
         Icon(
             painter = painterEye,
             tint = Blue,
-            contentDescription = null,
+            contentDescription = contentDescription,
         )
     }
 }
@@ -273,9 +287,15 @@ fun TodoList(todoItems: List<TodoItem>, onEvent: (MainScreenEvent) -> Unit) {
 
 @Composable
 fun NewTodo(onEvent: (MainScreenEvent) -> Unit) {
-    Column(Modifier.clickable {
-        onEvent(MainScreenEvent.NewItemPressed)
-    }) {
+    val description = stringResource(R.string.create_new_todo_screen)
+    Column(
+        Modifier
+            .semantics {
+                contentDescription = description
+            }
+            .clickable {
+                onEvent(MainScreenEvent.NewItemPressed)
+            }) {
         Spacer(Modifier.height(12.dp))
         Row(
             verticalAlignment = Alignment.CenterVertically,
